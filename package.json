@@ -1,0 +1,25 @@
+{
+  "name": "azulejaria",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Azulejaria - quebra-cabeça de encaixe 8x8 com azulejos",
+  "scripts": {
+    "preparar": "node scripts/preparar.mjs",
+    "android:criar": "npm run preparar && npx cap add android && node scripts/configurar-android.mjs && npx capacitor-assets generate --android",
+    "android:sync": "npm run preparar && npx cap sync android && node scripts/configurar-android.mjs",
+    "android:abrir": "npx cap open android",
+    "web": "npm run preparar && npx serve www"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor-community/admob": "^8.0.0",
+    "@fontsource/figtree": "^5.0.0",
+    "@fontsource/young-serif": "^5.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.0.0",
+    "serve": "^14.2.0"
+  }
+}

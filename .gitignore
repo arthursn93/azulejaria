@@ -1,0 +1,6 @@
+node_modules/
+www/fonts/
+www/ads-config.js
+android/app/release/
+*.jks
+*.keystore

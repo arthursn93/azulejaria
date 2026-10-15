@@ -1,0 +1,9 @@
+{
+  "appId": "br.app.azulejaria",
+  "appName": "Azulejaria",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#10141F",
+    "adjustMarginsForEdgeToEdge": "auto"
+  }
+}
