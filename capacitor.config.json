@@ -1,9 +1,9 @@
 {
-  "appId": "br.app.azulejaria",
+  "appId": "io.github.arthursn93.azulejaria",
   "appName": "Azulejaria",
   "webDir": "www",
   "android": {
-    "backgroundColor": "#10141F",
+    "backgroundColor": "#0A1F6B",
     "adjustMarginsForEdgeToEdge": "auto"
   }
 }

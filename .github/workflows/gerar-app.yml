@@ -1,0 +1,98 @@
+# Gera o app Android na nuvem do GitHub, sem instalar nada no seu computador.
+# Como usar: aba "Actions" > "Gerar app Android" > "Run workflow".
+# O resultado aparece no fim da execução, em "Artifacts":
+#   - azulejaria-aab: arquivo .aab para enviar à Play Console
+#   - azulejaria-apk: arquivo .apk para instalar direto no seu celular e testar
+# Assinatura: usa os segredos KEYSTORE_BASE64 e KEYSTORE_PASSWORD
+# (Settings > Secrets and variables > Actions). Sem eles, gera só um APK de teste.
+name: Gerar app Android
+
+on:
+  workflow_dispatch:
+    inputs:
+      versao_final:
+        description: "Versão final para a loja? (desliga os anúncios de teste)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TEM_CHAVE: ${{ secrets.KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Instalar dependências
+        run: npm install --no-audit --no-fund
+
+      - name: Desligar anúncios de teste (versão final)
+        if: ${{ inputs.versao_final }}
+        run: |
+          node -e '
+            const fs=require("fs");const c=JSON.parse(fs.readFileSync("admob.config.json","utf8"));
+            c.modoTeste=false;fs.writeFileSync("admob.config.json",JSON.stringify(c,null,2));'
+
+      - name: Criar projeto Android
+        run: |
+          npm run preparar
+          npx cap add android
+          node scripts/configurar-android.mjs
+          npx capacitor-assets generate --android
+
+      - name: Ajustar versão e SDK
+        run: |
+          VERSAO=$(node -p 'require("./package.json").version')
+          sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/; s/versionName \"[^\"]*\"/versionName \"$VERSAO\"/" android/app/build.gradle
+          sed -i -E "s/(compileSdkVersion|targetSdkVersion) = [0-9]+/\1 = 36/" android/variables.gradle
+          grep -E "versionCode|versionName" android/app/build.gradle
+          grep -E "compileSdkVersion|targetSdkVersion|minSdkVersion" android/variables.gradle
+
+      - name: Gerar app assinado (.aab e .apk)
+        if: env.TEM_CHAVE == 'true'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          cd android
+          ./gradlew --no-daemon bundleRelease assembleRelease \
+            -Pandroid.injected.signing.store.file="$RUNNER_TEMP/upload.jks" \
+            -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias=azulejaria \
+            -Pandroid.injected.signing.key.password="$KEYSTORE_PASSWORD"
+          mkdir -p ../saida
+          cp app/build/outputs/bundle/release/app-release.aab ../saida/azulejaria-${{ github.run_number }}.aab
+          cp app/build/outputs/apk/release/app-release.apk ../saida/azulejaria-${{ github.run_number }}.apk
+
+      - name: Gerar APK de teste (sem chave cadastrada)
+        if: env.TEM_CHAVE != 'true'
+        run: |
+          cd android
+          ./gradlew --no-daemon assembleDebug
+          mkdir -p ../saida
+          cp app/build/outputs/apk/debug/app-debug.apk ../saida/azulejaria-teste-${{ github.run_number }}.apk
+
+      - uses: actions/upload-artifact@v4
+        if: env.TEM_CHAVE == 'true'
+        with:
+          name: azulejaria-aab
+          path: saida/*.aab
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: azulejaria-apk
+          path: saida/*.apk
