@@ -1,10 +1,10 @@
 {
-  "_leia": "Enquanto 'modoTeste' for true, o app mostra anúncios de TESTE do Google (seguro para testar). Antes de publicar: troque os IDs pelos seus do painel do AdMob e mude 'modoTeste' para false. Depois rode: npm run android:sync",
+  "_leia": "IDs reais do AdMob já configurados. Enquanto 'modoTeste' for true, o app mostra anúncios de TESTE (seguro para testar no seu celular). Só mude para false na versão final que vai para a loja. Depois rode: npm run android:sync",
   "modoTeste": true,
-  "appId": "ca-app-pub-3940256099942544~3347511713",
-  "banner": "ca-app-pub-3940256099942544/9214589741",
-  "intersticial": "ca-app-pub-3940256099942544/1033173712",
-  "premiado": "ca-app-pub-3940256099942544/5224354917",
+  "appId": "ca-app-pub-8223124668049361~3407169560",
+  "banner": "ca-app-pub-8223124668049361/9160305102",
+  "intersticial": "ca-app-pub-8223124668049361/7847223436",
+  "premiado": "ca-app-pub-8223124668049361/3907978422",
   "intersticialACadaPartidas": 3,
   "intervaloMinimoIntersticialSegundos": 90
 }
