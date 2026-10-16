@@ -8,7 +8,7 @@ Este arquivo dá o contexto completo do projeto para o Claude Code. Leia inteiro
 
 - **Plataforma:** Android (Play Store). O jogo é web (HTML/CSS/JS puro) empacotado com **Capacitor 8**.
 - **Monetização:** apenas anúncios do **Google AdMob** (banner, intersticial e vídeo premiado). Sem compras dentro do app por enquanto.
-- **Idioma da interface:** português do Brasil.
+- **Idioma da interface:** português do Brasil, inglês e espanhol (`www/idioma.js`, detectado pelo idioma do celular; outros idiomas caem no inglês; `?lang=es` força no navegador).
 - **Público:** casual, 13 anos ou mais (não marcar como infantil na Play Store).
 - **Dono:** desenvolvedor solo, iniciante em publicação Android. Explique comandos e passos de forma simples quando ele pedir ajuda.
 
@@ -46,6 +46,7 @@ azulejaria/
 ├── www/                       ← o jogo (é o que vai dentro do app)
 │   ├── index.html             ← jogo completo: HTML + CSS + JS em um arquivo
 │   ├── ads.js                 ← camada de anúncios (window.Anuncios)
+│   ├── idioma.js              ← textos em pt/en/es (window.T)
 │   ├── sons.js                ← efeitos sonoros sintetizados com Web Audio (window.Sons)
 │   ├── ads-config.js          ← GERADO por scripts/preparar.mjs — não editar
 │   └── fonts/                 ← GERADO (copiado de node_modules/@fontsource)
@@ -154,7 +155,7 @@ Ao implementar qualquer item: mudanças pequenas, uma por vez, testadas e sem qu
 ## 12. Convenções de código
 
 - JS puro, sem build. Funções curtas, nomes em português ou inglês (manter o estilo do arquivo que está editando).
-- Textos visíveis ao jogador sempre em **português do Brasil**, curtos e diretos.
+- Textos visíveis ao jogador ficam em `www/idioma.js`, nos 3 idiomas, curtos e diretos. Nunca escrever texto direto no HTML/JS: usar `T("chave")` ou `data-t`.
 - Todo acesso a `localStorage` em try/catch.
 - Não editar arquivos gerados (`www/ads-config.js`, `www/fonts/`, partes geradas de `android/`), exceto `AndroidManifest.xml` e `variables.gradle` quando necessário.
 - Após mudar `www/` ou `admob.config.json`: lembrar o dono de rodar `npm run android:sync`.

@@ -156,6 +156,7 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
 <script src="ads-config.js"></script>
 <script src="ads.js"></script>
 <script src="sons.js"></script>
+<script src="idioma.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -178,24 +179,24 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
       </svg>
     </h1>
     <div class="hud">
-      <div class="recorde" title="Recorde"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l4.5 3.5L12 5l4.5 6.5L21 8l-2 11H5z" fill="#FFC93C" stroke="#7A3A00" stroke-width="1.2" stroke-linejoin="round"/></svg><span class="lbl" style="position:absolute;left:-9999px">Recorde</span><span class="num" id="best">0</span></div>
-      <div class="pontos" aria-label="Pontos"><div class="num" id="score">0</div></div>
+      <div class="recorde" title="Recorde" data-t-title="recorde"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l4.5 3.5L12 5l4.5 6.5L21 8l-2 11H5z" fill="#FFC93C" stroke="#7A3A00" stroke-width="1.2" stroke-linejoin="round"/></svg><span class="lbl" style="position:absolute;left:-9999px" data-t="recorde">Recorde</span><span class="num" id="best">0</span></div>
+      <div class="pontos" aria-label="Pontos" data-t-aria="pontos"><div class="num" id="score">0</div></div>
       <button class="mini" id="som" type="button" aria-pressed="true" aria-label="Som"></button>
     </div>
   </header>
 
   <div class="boardwrap">
-    <div id="board" aria-label="Painel de 8 por 8"></div>
+    <div id="board" aria-label="Painel de 8 por 8" data-t-aria="painel8"></div>
     <canvas id="fx" aria-hidden="true"></canvas>
     <div id="over" hidden>
       <div class="cartao">
-        <h2>Painel cheio</h2>
-        <div class="lbl">Sua obra valeu</div>
+        <h2 data-t="painelCheio">Painel cheio</h2>
+        <div class="lbl" data-t="obraValeu">Sua obra valeu</div>
         <div id="final">0</div>
         <div id="finalBest"></div>
         <div class="acoes">
           <button id="revive" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5v13l11-6.5z" fill="currentColor"/></svg><span>Ver vídeo e continuar</span></button>
-          <button id="again" type="button">Nova partida</button>
+          <button id="again" type="button" data-t="novaPartida">Nova partida</button>
         </div>
       </div>
     </div>
@@ -206,19 +207,20 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
   <div class="foot">
     <span id="dica"></span>
     <div class="btns">
-      <button class="mini" id="restart" type="button">Recomeçar</button>
+      <button class="mini" id="restart" type="button" data-t="recomecar">Recomeçar</button>
     </div>
   </div>
 </div>
 
 <div id="confirm" hidden>
   <div class="cartao">
-    <div>Recomeçar e perder este painel?</div>
-    <div class="row"><button class="claro" id="cNo" type="button">Voltar</button><button id="cYes" type="button">Recomeçar</button></div>
+    <div data-t="perderPainel">Recomeçar e perder este painel?</div>
+    <div class="row"><button class="claro" id="cNo" type="button" data-t="voltar">Voltar</button><button id="cYes" type="button" data-t="recomecar">Recomeçar</button></div>
   </div>
 </div>
 
 <script>
+aplicarIdioma();
 (function(){
 const N=8;
 const BASES=["#","##","###","####","#####","##/##","###/###/###","##/##/##","#./##","#../#../###","#./#./##",".#/.#/##","###/.#.",".##/##.","##./.##","#./.#","#../.#./..#"];
@@ -269,11 +271,11 @@ let ultimoPlacar=-1;
 function renderHud(){const sc=$("score");sc.textContent=S.score;$("best").textContent=Math.max(best,S.score);
   if(ultimoPlacar>=0&&S.score>ultimoPlacar){sc.classList.remove("sobe");void sc.offsetWidth;sc.classList.add("sobe")}ultimoPlacar=S.score;
   const vazio=S.score===0&&S.grid.every(v=>!v);
-  $("dica").innerHTML=vazio?"Arraste os azulejos para o painel":'Combo <span id="comboTag" class="'+(S.combo>1?"":"zero")+'">'+(S.combo>1?"×"+S.combo:"—")+"</span>"}
+  $("dica").innerHTML=vazio?T("dica"):T("combo")+' <span id="comboTag" class="'+(S.combo>1?"":"zero")+'">'+(S.combo>1?"×"+S.combo:"—")+"</span>"}
 function renderOver(){$("over").hidden=!S.over;if(!S.over)return;$("final").textContent=S.score;
-  const fb=$("finalBest"),novo=S.score>=best&&S.score>0;fb.textContent=novo?"Novo recorde!":"Recorde: "+best;fb.classList.toggle("novo",novo);
+  const fb=$("finalBest"),novo=S.score>=best&&S.score>0;fb.textContent=novo?T("novoRecorde"):T("recorde")+": "+best;fb.classList.toggle("novo",novo);
   const rv=$("revive");rv.hidden=S.revived;rv.disabled=!window.Anuncios||!Anuncios.premiadoDisponivel();
-  rv.querySelector("span").textContent=rv.disabled?"Vídeo indisponível agora":"Ver vídeo e continuar"}
+  rv.querySelector("span").textContent=rv.disabled?T("videoIndisp"):T("verVideo")}
 function render(){renderBoard();renderTray();renderHud();renderOver()}
 
 function floatText(main,sub,grande){const f=document.createElement("div");f.className="float"+(grande?" grande":"");
@@ -301,7 +303,7 @@ function passo(){fxc.setTransform(dpr,0,0,dpr,0,0);fxc.clearRect(0,0,fx.width,fx
     fxc.fillStyle=p.col;fxc.fillRect(-p.s/2,-p.s/2,p.s,p.s);fxc.fillStyle="rgba(255,255,255,.6)";fxc.fillRect(-p.s/2,-p.s/2,p.s,p.s*.3);fxc.restore()}
   if(parts.length)requestAnimationFrame(passo);else{fxOn=false;fxc.clearRect(0,0,fx.width,fx.height)}}
 
-const ELOGIOS={2:"Primoroso!",3:"Magnífico!",4:"Obra-prima!"};
+const ELOGIOS={2:T("elogio2"),3:T("elogio3"),4:T("elogio4")};
 function place(i,r,c){const p=S.tray[i];const postos=p.cells.map(([y,x])=>(r+y)*N+c+x);postos.forEach(k=>S.grid[k]=p.color);S.tray[i]=null;
   let gain=p.cells.length;const{rows,cols}=fullLines(S.grid);const lines=rows.length+cols.length;
   if(lines){S.combo++;S.since=0;const burst=new Set();rows.forEach(rr=>{for(let x=0;x<N;x++)burst.add(rr*N+x)});cols.forEach(cc=>{for(let y=0;y<N;y++)burst.add(y*N+cc)});
@@ -312,14 +314,14 @@ function place(i,r,c){const p=S.tray[i];const postos=p.cells.map(([y,x])=>(r+y)*
     const limpo=S.grid.every(v=>!v);if(limpo)gain+=300;
     const s=som();if(s){s.encaixar(p.cells.length);s.limpar(lines,S.combo);if(limpo)s.painelLimpo()}
     if(navigator.vibrate)try{navigator.vibrate(lines>1?[20,40,30]:15)}catch(e){}
-    const combo=S.combo>1?" · Combo ×"+S.combo:"";
-    if(limpo)floatText("Painel limpo!","+"+gain+combo,true);
+    const combo=S.combo>1?" · "+T("combo")+" ×"+S.combo:"";
+    if(limpo)floatText(T("painelLimpo"),"+"+gain+combo,true);
     else if(lines>1)floatText(ELOGIOS[Math.min(lines,4)],"+"+gain+combo,lines>=3);
-    else if(S.combo>1)floatText("Combo ×"+S.combo,"+"+gain);
+    else if(S.combo>1)floatText(T("combo")+" ×"+S.combo,"+"+gain);
     else floatText("+"+gain,"")}
   else{S.since++;if(S.since>=3)S.combo=0;const s=som();if(s)s.encaixar(p.cells.length)}
   const antes=S.score;S.score+=gain;
-  if(best>0&&antes<=best&&S.score>best&&!S.recordeAvisado){S.recordeAvisado=true;setTimeout(()=>{floatText("Novo recorde!","",true);const s=som();if(s)s.recorde()},lines?900:150)}
+  if(best>0&&antes<=best&&S.score>best&&!S.recordeAvisado){S.recordeAvisado=true;setTimeout(()=>{floatText(T("novoRecorde"),"",true);const s=som();if(s)s.recorde()},lines?900:150)}
   bumpBest();
   if(S.tray.every(t=>!t)){S.tray=[randPiece(),randPiece(),randPiece()];trayNova=true}
   if(!S.tray.some(t=>t&&anyFit(S.grid,t)))S.over=true;
@@ -332,7 +334,7 @@ function place(i,r,c){const p=S.tray[i];const postos=p.cells.map(([y,x])=>(r+y)*
 function revive(){const fams=PEQUENAS.map(k=>FAMILIES[k]);const out=[];
   for(let n=0;n<3;n++){let p,t=0;do{p=randPiece(fams);t++}while(!anyFit(S.grid,p)&&t<40);out.push(p)}
   S.tray=out;S.over=false;S.revived=true;trayNova=true;save();render()}
-$("revive").onclick=async()=>{const b=$("revive");b.disabled=true;b.querySelector("span").textContent="Carregando vídeo…";
+$("revive").onclick=async()=>{const b=$("revive");b.disabled=true;b.querySelector("span").textContent=T("carregando");
   const ok=await Anuncios.mostrarPremiado();if(ok)revive();else renderOver()};
 
 /* arrastar */
@@ -360,7 +362,7 @@ $("cYes").onclick=()=>{$("confirm").hidden=true;novaComAnuncio()};
 /* botão de som */
 const ICONE_SOM='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 const ICONE_MUDO='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-function renderSom(){const b=$("som"),on=!window.Sons||Sons.ligado;b.setAttribute("aria-pressed",on);b.setAttribute("aria-label",on?"Desligar som":"Ligar som");b.innerHTML=on?ICONE_SOM:ICONE_MUDO}
+function renderSom(){const b=$("som"),on=!window.Sons||Sons.ligado;b.setAttribute("aria-pressed",on);b.setAttribute("aria-label",on?T("desligarSom"):T("ligarSom"));b.innerHTML=on?ICONE_SOM:ICONE_MUDO}
 $("som").onclick=()=>{if(window.Sons)Sons.alternar();renderSom()};renderSom();
 window.addEventListener("resize",()=>renderTray());
 
