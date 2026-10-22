@@ -150,6 +150,12 @@ button:disabled{opacity:.5;filter:grayscale(.6)}
 #confirm .cartao{padding:26px 20px 20px;max-width:290px;display:flex;flex-direction:column;gap:16px;font-weight:700;font-size:1rem}
 #confirm .row{display:flex;gap:10px;justify-content:center}
 button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0 0 2px var(--cobalt),0 3px 0 rgba(20,46,128,.35)}
+#tuto{position:fixed;inset:0;z-index:55;background:rgba(2,8,40,.6);display:flex;align-items:center;justify-content:center;padding:24px}
+#tuto .cartao{padding:30px 22px 20px;max-width:300px;display:flex;flex-direction:column;gap:14px}
+#tuto h2{font-family:var(--f-display);font-weight:400;font-size:1.5rem;margin:0}
+#tuto p{margin:0;font-size:1rem;line-height:1.35}
+#tutoPassos{font-size:.8rem;font-weight:700;color:#5B6FA8}
+#tuto .row{display:flex;gap:10px;justify-content:center}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion: reduce){.cell.burst,.float,.cell.pop,.piece.chega,#over .cartao,.num.sobe{animation-duration:.01s;animation-delay:0s}.cell.willclear::after{animation:none}}
 </style>
@@ -216,6 +222,13 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
   <div class="cartao">
     <div data-t="perderPainel">Recomeçar e perder este painel?</div>
     <div class="row"><button class="claro" id="cNo" type="button" data-t="voltar">Voltar</button><button id="cYes" type="button" data-t="recomecar">Recomeçar</button></div>
+  </div>
+</div>
+
+<div id="tuto" hidden role="dialog" aria-modal="true">
+  <div class="cartao">
+    <h2 id="tutoTit"></h2><p id="tutoTxt"></p><div id="tutoPassos"></div>
+    <div class="row"><button class="claro" id="tutoPular" type="button" data-t="tutoPular">Pular</button><button id="tutoProx" type="button"></button></div>
   </div>
 </div>
 
@@ -366,8 +379,17 @@ function renderSom(){const b=$("som"),on=!window.Sons||Sons.ligado;b.setAttribut
 $("som").onclick=()=>{if(window.Sons)Sons.alternar();renderSom()};renderSom();
 window.addEventListener("resize",()=>renderTray());
 
+/* tutorial de 3 passos, só na primeira vez */
+let tutoI=0;
+function fechaTuto(){$("tuto").hidden=true;store.set("azulejaria-tutorial","1")}
+function renderTuto(){$("tutoTit").textContent=T("tutoT"+(tutoI+1));$("tutoTxt").textContent=T("tutoP"+(tutoI+1));
+  $("tutoPassos").textContent=(tutoI+1)+" / 3";$("tutoProx").textContent=T(tutoI<2?"tutoProx":"tutoJogar")}
+$("tutoProx").onclick=()=>{if(tutoI<2){tutoI++;renderTuto()}else fechaTuto()};
+$("tutoPular").onclick=fechaTuto;
+
 /* retoma a partida salva ao reabrir o app */
 try{const s=JSON.parse(store.get("azulejaria-estado"));if(s&&Array.isArray(s.grid)&&s.grid.length===N*N&&Array.isArray(s.tray)){S=s;render()}else newGame()}catch(e){newGame()}
+if(!store.get("azulejaria-tutorial")&&S.score===0){renderTuto();$("tuto").hidden=false}
 window.__azulejaria={get S(){return S},fits,anyFit,fullLines,place,revive,FAMILIES};
 })();
 </script>

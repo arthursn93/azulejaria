@@ -9,6 +9,10 @@
       novaPartida: "Nova partida", recomecar: "Recomeçar", voltar: "Voltar", perderPainel: "Recomeçar e perder este painel?",
       dica: "Arraste os azulejos para o painel", combo: "Combo", novoRecorde: "Novo recorde!", painelLimpo: "Painel limpo!",
       elogio2: "Primoroso!", elogio3: "Magnífico!", elogio4: "Obra-prima!",
+      tutoT1: "Arraste os azulejos", tutoP1: "Toque numa peça da bandeja e arraste até o painel.",
+      tutoT2: "Complete linhas", tutoP2: "Linhas e colunas cheias somem e dão pontos. Limpe várias seguidas para fazer combo!",
+      tutoT3: "Não encha o painel", tutoP3: "A partida acaba quando nenhuma peça couber. Planeje o espaço!",
+      tutoProx: "Próximo", tutoJogar: "Jogar", tutoPular: "Pular",
     },
     en: {
       recorde: "Best", pontos: "Score", som: "Sound", ligarSom: "Sound on", desligarSom: "Sound off",
@@ -17,6 +21,10 @@
       novaPartida: "New game", recomecar: "Restart", voltar: "Back", perderPainel: "Restart and lose this board?",
       dica: "Drag the tiles onto the board", combo: "Combo", novoRecorde: "New record!", painelLimpo: "Board clear!",
       elogio2: "Exquisite!", elogio3: "Magnificent!", elogio4: "Masterpiece!",
+      tutoT1: "Drag the tiles", tutoP1: "Touch a piece in the tray and drag it onto the board.",
+      tutoT2: "Fill lines", tutoP2: "Full rows and columns clear and score points. Clear several in a row for a combo!",
+      tutoT3: "Don't fill the board", tutoP3: "The game ends when no piece fits. Plan your space!",
+      tutoProx: "Next", tutoJogar: "Play", tutoPular: "Skip",
     },
     es: {
       recorde: "Récord", pontos: "Puntos", som: "Sonido", ligarSom: "Activar sonido", desligarSom: "Silenciar",
@@ -25,6 +33,10 @@
       novaPartida: "Nueva partida", recomecar: "Reiniciar", voltar: "Volver", perderPainel: "¿Reiniciar y perder este tablero?",
       dica: "Arrastra los azulejos al tablero", combo: "Combo", novoRecorde: "¡Nuevo récord!", painelLimpo: "¡Tablero limpio!",
       elogio2: "¡Primoroso!", elogio3: "¡Magnífico!", elogio4: "¡Obra maestra!",
+      tutoT1: "Arrastra los azulejos", tutoP1: "Toca una pieza de la bandeja y arrástrala al panel.",
+      tutoT2: "Completa líneas", tutoP2: "Las filas y columnas llenas desaparecen y dan puntos. ¡Limpia varias seguidas para hacer combo!",
+      tutoT3: "No llenes el panel", tutoP3: "La partida termina cuando ninguna pieza cabe. ¡Planifica el espacio!",
+      tutoProx: "Siguiente", tutoJogar: "Jugar", tutoPular: "Saltar",
     },
   };
   let lang = "en";
