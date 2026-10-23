@@ -12,7 +12,7 @@
       tutoT1: "Arraste os azulejos", tutoP1: "Toque numa peça da bandeja e arraste até o painel.",
       tutoT2: "Complete linhas", tutoP2: "Linhas e colunas cheias somem e dão pontos. Limpe várias seguidas para fazer combo!",
       tutoT3: "Não encha o painel", tutoP3: "A partida acaba quando nenhuma peça couber. Planeje o espaço!",
-      tutoProx: "Próximo", tutoJogar: "Jogar", tutoPular: "Pular",
+      tutoProx: "Próximo", tutoJogar: "Jogar", tutoPular: "Pular", avaliar: "Avaliar", compartilhar: "Compartilhar", convite: "Fiz {p} pontos no Azulejaria! Será que você consegue mais?",
     },
     en: {
       recorde: "Best", pontos: "Score", som: "Sound", ligarSom: "Sound on", desligarSom: "Sound off",
@@ -24,7 +24,7 @@
       tutoT1: "Drag the tiles", tutoP1: "Touch a piece in the tray and drag it onto the board.",
       tutoT2: "Fill lines", tutoP2: "Full rows and columns clear and score points. Clear several in a row for a combo!",
       tutoT3: "Don't fill the board", tutoP3: "The game ends when no piece fits. Plan your space!",
-      tutoProx: "Next", tutoJogar: "Play", tutoPular: "Skip",
+      tutoProx: "Next", tutoJogar: "Play", tutoPular: "Skip", avaliar: "Rate", compartilhar: "Share", convite: "I scored {p} points in Azulejaria! Can you beat me?",
     },
     es: {
       recorde: "Récord", pontos: "Puntos", som: "Sonido", ligarSom: "Activar sonido", desligarSom: "Silenciar",
@@ -36,7 +36,7 @@
       tutoT1: "Arrastra los azulejos", tutoP1: "Toca una pieza de la bandeja y arrástrala al panel.",
       tutoT2: "Completa líneas", tutoP2: "Las filas y columnas llenas desaparecen y dan puntos. ¡Limpia varias seguidas para hacer combo!",
       tutoT3: "No llenes el panel", tutoP3: "La partida termina cuando ninguna pieza cabe. ¡Planifica el espacio!",
-      tutoProx: "Siguiente", tutoJogar: "Jugar", tutoPular: "Saltar",
+      tutoProx: "Siguiente", tutoJogar: "Jugar", tutoPular: "Saltar", avaliar: "Valorar", compartilhar: "Compartir", convite: "¡Hice {p} puntos en Azulejaria! ¿Puedes superarme?",
     },
   };
   let lang = "en";

@@ -146,6 +146,8 @@ button:disabled{opacity:.5;filter:grayscale(.6)}
 #finalBest{font-size:.85rem;font-weight:700;color:#5B6FA8;min-height:1.2em}
 #finalBest.novo{color:#fff;background:linear-gradient(180deg,#FFD95A,#F5A623);padding:3px 12px;border-radius:999px;color:#5A2A00}
 #over .acoes{display:flex;flex-direction:column;gap:12px;margin-top:12px;width:100%}
+#over .extras{display:flex;gap:18px;justify-content:center;margin-top:10px}
+button.link{background:none;box-shadow:none;padding:4px 2px;color:var(--cobalt-ink);font-size:.9rem;text-decoration:underline;text-underline-offset:3px}
 #confirm{position:fixed;inset:0;z-index:60;background:rgba(2,8,40,.6);display:flex;align-items:center;justify-content:center;padding:24px}
 #confirm .cartao{padding:26px 20px 20px;max-width:290px;display:flex;flex-direction:column;gap:16px;font-weight:700;font-size:1rem}
 #confirm .row{display:flex;gap:10px;justify-content:center}
@@ -204,6 +206,7 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
           <button id="revive" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5v13l11-6.5z" fill="currentColor"/></svg><span>Ver vídeo e continuar</span></button>
           <button id="again" type="button" data-t="novaPartida">Nova partida</button>
         </div>
+        <div class="extras"><button class="link" id="avaliar" type="button" data-t="avaliar">Avaliar</button><button class="link" id="compartilhar" type="button" data-t="compartilhar">Compartilhar</button></div>
       </div>
     </div>
   </div>
@@ -378,6 +381,14 @@ const ICONE_MUDO='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-
 function renderSom(){const b=$("som"),on=!window.Sons||Sons.ligado;b.setAttribute("aria-pressed",on);b.setAttribute("aria-label",on?T("desligarSom"):T("ligarSom"));b.innerHTML=on?ICONE_SOM:ICONE_MUDO}
 $("som").onclick=()=>{if(window.Sons)Sons.alternar();renderSom()};renderSom();
 window.addEventListener("resize",()=>renderTray());
+
+/* avaliar e compartilhar (só no fim de jogo) */
+const LOJA="https://play.google.com/store/apps/details?id=io.github.arthursn93.azulejaria";
+$("avaliar").onclick=()=>window.open(LOJA,"_blank");
+$("compartilhar").onclick=async()=>{const txt=T("convite").replace("{p}",S.score);
+  try{const P=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Share;
+    if(P)await P.share({text:txt,url:LOJA});else if(navigator.share)await navigator.share({text:txt,url:LOJA});
+    else window.open(LOJA,"_blank")}catch(e){}};
 
 /* tutorial de 3 passos, só na primeira vez */
 let tutoI=0;
