@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0A1F6B">
-<title>Azulejaria</title>
+<title>Azulejaria: Block Puzzle!</title>
 <style>
 @font-face{font-family:"Young Serif";src:url(fonts/young-serif-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"Figtree";src:url(fonts/figtree-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap}
@@ -158,6 +158,24 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
 #tuto p{margin:0;font-size:1rem;line-height:1.35}
 #tutoPassos{font-size:.8rem;font-weight:700;color:#5B6FA8}
 #tuto .row{display:flex;gap:10px;justify-content:center}
+/* menu inicial e ranking */
+#menu{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px 24px calc(24px + var(--banner-h));background:inherit;background-color:var(--bg-deep)}
+#menu .placa{width:min(290px,78vw)}
+#menu .sub{font-family:var(--f-display);font-size:1.6rem;color:var(--gold);text-shadow:0 3px 0 rgba(4,12,52,.6);margin-top:-6px}
+#menu .melhor{color:var(--muted);font-weight:700;min-height:1.2em}
+#menu .acoes{display:flex;flex-direction:column;gap:12px;width:min(260px,80vw);margin-top:10px}
+#menu .acoes button{font-size:1.1rem;padding:14px}
+#menu button.claro{color:#fff;box-shadow:inset 0 0 0 2px rgba(255,255,255,.75),0 3px 0 rgba(4,12,52,.45)}
+#somMenu{padding:6px 10px;line-height:0}#somMenu svg{width:20px;height:20px}
+#menu .rodape{position:absolute;top:calc(14px + env(safe-area-inset-top));right:16px}
+#ranking{position:fixed;inset:0;z-index:58;background:rgba(2,8,40,.6);display:flex;align-items:center;justify-content:center;padding:24px}
+#ranking .cartao{padding:28px 20px 18px;width:min(300px,100%);display:flex;flex-direction:column;gap:12px}
+#ranking h2{font-family:var(--f-display);font-weight:400;font-size:1.5rem;margin:0}
+#rankLista{list-style:none;margin:0;padding:0;text-align:left;font-variant-numeric:tabular-nums}
+#rankLista li{display:flex;gap:10px;align-items:baseline;padding:6px 4px;border-bottom:1px solid #DCD3BF}
+#rankLista li b{width:1.6em;color:#5B6FA8}#rankLista li span{flex:1;font-weight:800;font-size:1.05rem}#rankLista li small{color:#5B6FA8}
+#rankLista li.atual{background:#FFE9A8;border-radius:6px}
+#rankVazio{color:#5B6FA8;font-weight:600}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion: reduce){.cell.burst,.float,.cell.pop,.piece.chega,#over .cartao,.num.sobe{animation-duration:.01s;animation-delay:0s}.cell.willclear::after{animation:none}}
 </style>
@@ -206,7 +224,7 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
           <button id="revive" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5v13l11-6.5z" fill="currentColor"/></svg><span>Ver vídeo e continuar</span></button>
           <button id="again" type="button" data-t="novaPartida">Nova partida</button>
         </div>
-        <div class="extras"><button class="link" id="avaliar" type="button" data-t="avaliar">Avaliar</button><button class="link" id="compartilhar" type="button" data-t="compartilhar">Compartilhar</button></div>
+        <div class="extras"><button class="link" id="verRank" type="button" data-t="recordes">Recordes</button><button class="link" id="avaliar" type="button" data-t="avaliar">Avaliar</button><button class="link" id="compartilhar" type="button" data-t="compartilhar">Compartilhar</button></div>
       </div>
     </div>
   </div>
@@ -216,6 +234,7 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
   <div class="foot">
     <span id="dica"></span>
     <div class="btns">
+      <button class="mini" id="abrirMenu" type="button" data-t="menu">Menu</button>
       <button class="mini" id="restart" type="button" data-t="recomecar">Recomeçar</button>
     </div>
   </div>
@@ -225,6 +244,26 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
   <div class="cartao">
     <div data-t="perderPainel">Recomeçar e perder este painel?</div>
     <div class="row"><button class="claro" id="cNo" type="button" data-t="voltar">Voltar</button><button id="cYes" type="button" data-t="recomecar">Recomeçar</button></div>
+  </div>
+</div>
+
+<div id="menu" hidden>
+  <div class="rodape"><button class="mini" id="somMenu" type="button"></button></div>
+  <div class="placa" id="menuPlaca"></div>
+  <div class="sub" data-t="subtitulo">Block Puzzle!</div>
+  <div class="melhor" id="menuBest"></div>
+  <div class="acoes">
+    <button id="mJogar" type="button" data-t="jogar">Jogar</button>
+    <button id="mNova" type="button" class="claro" data-t="novaPartida" hidden>Nova partida</button>
+    <button id="mRank" type="button" class="claro" data-t="recordes">Recordes</button>
+  </div>
+</div>
+
+<div id="ranking" hidden role="dialog" aria-modal="true">
+  <div class="cartao">
+    <h2 data-t="seusRecordes">Seus recordes</h2>
+    <ol id="rankLista"></ol><div id="rankVazio" data-t="semRecordes" hidden></div>
+    <div class="row" style="display:flex;justify-content:center"><button id="rankFechar" type="button" data-t="fechar">Fechar</button></div>
   </div>
 </div>
 
@@ -247,7 +286,10 @@ function rot(c){return norm(c.map(([y,x])=>[x,-y]))}
 const FAMILIES=BASES.map(b=>{let c=norm(parse(b));const out=[],seen=new Set();for(let i=0;i<4;i++){const k=JSON.stringify(c);if(!seen.has(k)){seen.add(k);out.push(c)}c=rot(c)}return out});
 function dims(c){return[Math.max(...c.map(p=>p[0]))+1,Math.max(...c.map(p=>p[1]))+1]}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
-function randPiece(fams){const f=pick(fams||FAMILIES);return{cells:pick(f),color:1+Math.floor(Math.random()*5)}}
+/* cores liberadas aos poucos: começa só com o cobalto e ganha uma cor nova a cada marco de pontos */
+const MARCOS_COR=[0,100,300,600,1000];
+function coresAte(p){return MARCOS_COR.filter(m=>p>=m).length}
+function randPiece(fams){const f=pick(fams||FAMILIES);const n=S?coresAte(S.score):1;return{cells:pick(f),color:1+Math.floor(Math.random()*n)}}
 
 const $=id=>document.getElementById(id);
 const boardEl=$("board"),trayEl=$("tray");
@@ -265,7 +307,7 @@ function fullLines(grid){const rows=[],cols=[];for(let r=0;r<N;r++){let f=true;f
   for(let c=0;c<N;c++){let f=true;for(let r=0;r<N;r++)if(!grid[r*N+c]){f=false;break}if(f)cols.push(c)}return{rows,cols}}
 
 function save(){store.set("azulejaria-estado",JSON.stringify(S))}
-function newGame(){S={grid:Array(N*N).fill(0),tray:[randPiece(),randPiece(),randPiece()],score:0,combo:0,since:0,over:false,revived:false,recordeAvisado:false};trayNova=true;save();render()}
+function newGame(){S=null;S={id:Date.now(),grid:Array(N*N).fill(0),tray:[randPiece(),randPiece(),randPiece()],score:0,combo:0,since:0,over:false,revived:false,recordeAvisado:false};trayNova=true;save();render()}
 
 function renderBoard(prev){
   const g=S.grid;let clearSet=null,prevSet=null;
@@ -290,8 +332,16 @@ function renderHud(){const sc=$("score");sc.textContent=S.score;$("best").textCo
   $("dica").innerHTML=vazio?T("dica"):T("combo")+' <span id="comboTag" class="'+(S.combo>1?"":"zero")+'">'+(S.combo>1?"×"+S.combo:"—")+"</span>"}
 function renderOver(){$("over").hidden=!S.over;if(!S.over)return;$("final").textContent=S.score;
   const fb=$("finalBest"),novo=S.score>=best&&S.score>0;fb.textContent=novo?T("novoRecorde"):T("recorde")+": "+best;fb.classList.toggle("novo",novo);
-  const rv=$("revive");rv.hidden=S.revived;rv.disabled=!window.Anuncios||!Anuncios.premiadoDisponivel();
-  rv.querySelector("span").textContent=rv.disabled?T("videoIndisp"):T("verVideo")}
+  atualizaRevive()}
+/* "Continuar": espera o vídeo carregar; sem internet, libera uma segunda chance grátis */
+let overDesde=0,reviveTimer=0;
+function videoPronto(){return!!(window.Anuncios&&Anuncios.premiadoDisponivel())}
+function atualizaRevive(){const rv=$("revive");rv.hidden=S.revived;if(S.revived||!S.over){clearInterval(reviveTimer);reviveTimer=0;return}
+  if(!overDesde)overDesde=Date.now();
+  const gratis=!videoPronto()&&Date.now()-overDesde>6000;rv.dataset.gratis=gratis?"1":"";
+  rv.disabled=!videoPronto()&&!gratis;
+  rv.querySelector("span").textContent=videoPronto()?T("verVideo"):gratis?T("continuarGratis"):T("carregando");
+  if(!reviveTimer)reviveTimer=setInterval(()=>{if($("over").hidden||rv.dataset.ocupado)return;atualizaRevive()},1000)}
 function render(){renderBoard();renderTray();renderHud();renderOver()}
 
 function floatText(main,sub,grande){const f=document.createElement("div");f.className="float"+(grande?" grande":"");
@@ -337,6 +387,7 @@ function place(i,r,c){const p=S.tray[i];const postos=p.cells.map(([y,x])=>(r+y)*
     else floatText("+"+gain,"")}
   else{S.since++;if(S.since>=3)S.combo=0;const s=som();if(s)s.encaixar(p.cells.length)}
   const antes=S.score;S.score+=gain;
+  if(coresAte(S.score)>coresAte(antes))setTimeout(()=>floatText(T("novaCor"),"",false),lines?1250:200);
   if(best>0&&antes<=best&&S.score>best&&!S.recordeAvisado){S.recordeAvisado=true;setTimeout(()=>{floatText(T("novoRecorde"),"",true);const s=som();if(s)s.recorde()},lines?900:150)}
   bumpBest();
   if(S.tray.every(t=>!t)){S.tray=[randPiece(),randPiece(),randPiece()];trayNova=true}
@@ -344,14 +395,15 @@ function place(i,r,c){const p=S.tray[i];const postos=p.cells.map(([y,x])=>(r+y)*
   save();renderBoard();
   postos.forEach(k=>{if(S.grid[k]){const el=cellEls[k];el.classList.remove("pop");void el.offsetWidth;el.classList.add("pop");setTimeout(()=>el.classList.remove("pop"),240)}});
   renderTray();renderHud();
-  if(S.over)setTimeout(()=>{renderOver();const s=som();if(s){if(S.score>=best&&S.score>0)s.recorde();else s.fimDeJogo()}},600)}
+  if(S.over){registrarRank();setTimeout(()=>{renderOver();const s=som();if(s){if(S.score>=best&&S.score>0)s.recorde();else s.fimDeJogo()}},600)}}
 
 /* Continuar: 3 peças pequenas que cabem no tabuleiro, uma vez por partida */
-function revive(){const fams=PEQUENAS.map(k=>FAMILIES[k]);const out=[];
+function revive(){overDesde=0;const fams=PEQUENAS.map(k=>FAMILIES[k]);const out=[];
   for(let n=0;n<3;n++){let p,t=0;do{p=randPiece(fams);t++}while(!anyFit(S.grid,p)&&t<40);out.push(p)}
   S.tray=out;S.over=false;S.revived=true;trayNova=true;save();render()}
-$("revive").onclick=async()=>{const b=$("revive");b.disabled=true;b.querySelector("span").textContent=T("carregando");
-  const ok=await Anuncios.mostrarPremiado();if(ok)revive();else renderOver()};
+$("revive").onclick=async()=>{const b=$("revive");if(b.dataset.gratis){revive();return}
+  b.disabled=true;b.dataset.ocupado="1";b.querySelector("span").textContent=T("carregando");
+  const ok=await Anuncios.mostrarPremiado();b.dataset.ocupado="";if(ok)revive();else renderOver()};
 
 /* arrastar */
 let drag=null,ghost=null;
@@ -369,7 +421,7 @@ function end(){if(!drag)return;const d=drag;drag=null;ghost.remove();ghost=null;
   if(d.pos)place(d.i,d.pos.r,d.pos.c);else{renderBoard();const s=som();if(s)s.invalido()}}
 window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
 
-async function novaComAnuncio(){if(window.Anuncios)await Anuncios.talvezIntersticial();newGame()}
+async function novaComAnuncio(){if(window.Anuncios)await Anuncios.talvezIntersticial();overDesde=0;newGame()}
 $("again").onclick=novaComAnuncio;
 $("restart").onclick=()=>{if(S.over||S.score===0){novaComAnuncio();return}$("confirm").hidden=false};
 $("cNo").onclick=()=>$("confirm").hidden=true;
@@ -390,6 +442,30 @@ $("compartilhar").onclick=async()=>{const txt=T("convite").replace("{p}",S.score
     if(P)await P.share({text:txt,url:LOJA});else if(navigator.share)await navigator.share({text:txt,url:LOJA});
     else window.open(LOJA,"_blank")}catch(e){}};
 
+/* ranking local: as 10 melhores partidas, guardadas no aparelho */
+function lerRank(){try{const r=JSON.parse(store.get("azulejaria-ranking"));return Array.isArray(r)?r:[]}catch(e){return[]}}
+function registrarRank(){if(!S.score)return;let r=lerRank().filter(x=>x.id!==S.id);r.push({id:S.id||Date.now(),p:S.score,d:Date.now()});
+  r.sort((a,b)=>b.p-a.p);store.set("azulejaria-ranking",JSON.stringify(r.slice(0,10)))}
+function abrirRank(){const r=lerRank(),ul=$("rankLista");ul.innerHTML="";
+  r.forEach((x,i)=>{const li=document.createElement("li");if(S&&x.id===S.id)li.className="atual";
+    const b=document.createElement("b");b.textContent=(i+1)+".";const sp=document.createElement("span");sp.textContent=x.p;
+    const sm=document.createElement("small");sm.textContent=new Date(x.d).toLocaleDateString(IDIOMA);li.append(b,sp,sm);ul.appendChild(li)});
+  $("rankVazio").hidden=r.length>0;$("ranking").hidden=false}
+$("verRank").onclick=abrirRank;$("mRank").onclick=abrirRank;$("rankFechar").onclick=()=>$("ranking").hidden=true;
+
+/* menu inicial */
+$("menuPlaca").appendChild(document.querySelector("header .placa svg").cloneNode(true));
+function emAndamento(){return S&&!S.over&&S.score>0}
+function abrirMenu(){$("menuBest").textContent=best?T("recorde")+": "+best:"";
+  $("mJogar").textContent=emAndamento()?T("continuar"):T("jogar");$("mNova").hidden=!emAndamento();
+  renderSomMenu();$("menu").hidden=false}
+function fecharMenu(){$("menu").hidden=true;renderTray();if(!store.get("azulejaria-tutorial")&&S.score===0){renderTuto();$("tuto").hidden=false}}
+$("mJogar").onclick=()=>{if(S.over)newGame();fecharMenu()};
+$("mNova").onclick=()=>{newGame();fecharMenu()};
+$("abrirMenu").onclick=abrirMenu;
+function renderSomMenu(){const on=!window.Sons||Sons.ligado;$("somMenu").innerHTML=on?ICONE_SOM:ICONE_MUDO;$("somMenu").setAttribute("aria-label",on?T("desligarSom"):T("ligarSom"))}
+$("somMenu").onclick=()=>{if(window.Sons)Sons.alternar();renderSom();renderSomMenu()};
+
 /* tutorial de 3 passos, só na primeira vez */
 let tutoI=0;
 function fechaTuto(){$("tuto").hidden=true;store.set("azulejaria-tutorial","1")}
@@ -400,8 +476,8 @@ $("tutoPular").onclick=fechaTuto;
 
 /* retoma a partida salva ao reabrir o app */
 try{const s=JSON.parse(store.get("azulejaria-estado"));if(s&&Array.isArray(s.grid)&&s.grid.length===N*N&&Array.isArray(s.tray)){S=s;render()}else newGame()}catch(e){newGame()}
-if(!store.get("azulejaria-tutorial")&&S.score===0){renderTuto();$("tuto").hidden=false}
-window.__azulejaria={get S(){return S},fits,anyFit,fullLines,place,revive,FAMILIES};
+abrirMenu();
+window.__azulejaria={get S(){return S},fits,anyFit,fullLines,place,revive,FAMILIES,coresAte,lerRank};
 })();
 </script>
 </body>

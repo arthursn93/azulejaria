@@ -85,6 +85,10 @@ O build de release (.aab) é feito no Android Studio: **Build → Generate Signe
 - **Combo:** cada jogada que limpa linha aumenta `S.combo`. Após **3 jogadas seguidas sem limpar** (`S.since >= 3`), o combo zera.
 - **Fim de jogo:** quando nenhuma peça da bandeja cabe em lugar nenhum (`S.over = true`).
 - **Continuar (revive):** 1 vez por partida (`S.revived`), após vídeo premiado. Dá 3 peças pequenas (índices `PEQUENAS` em `BASES`) que cabem.
+- **Cores progressivas:** a partida começa só com azulejos cobalto (`t1`); uma cor nova é liberada em 100, 300, 600 e 1000 pontos (`MARCOS_COR`, `coresAte()`), com aviso "Nova cor!".
+- **Menu inicial:** `#menu` abre ao iniciar o app (Jogar/Continuar partida, Nova partida, Recordes, som). O botão "Menu" no rodapé volta a ele.
+- **Ranking local:** as 10 melhores partidas ficam em `azulejaria-ranking` (`{id,p,d}`), gravadas no fim de jogo (`registrarRank`).
+- **Continuar sem internet:** se o vídeo premiado não carregar em 6 s, o botão vira "Continuar" grátis (uma vez por partida), para nunca travar o jogo offline.
 - **Persistência:** `localStorage` com as chaves `azulejaria-estado` (partida atual) e `azulejaria-best` (recorde). Sempre em try/catch.
 - **Sons (`www/sons.js`):** sintetizados na hora com Web Audio, sem arquivos de áudio e 100% originais. Identidade sonora: azulejo + guitarra portuguesa (cordas de aço em pares, algoritmo Karplus-Strong). Encaixe = "clinc" de cerâmica; limpar = notas dedilhadas na pentatônica de Lá que sobem com o combo; painel limpo = acorde rasgado; recorde = arpejo; fim de jogo = descida em Lá menor harmônico ("suspiro" de fado). Botão de alto-falante no topo, salvo na chave `azulejaria-som`. O áudio começa após o primeiro toque e pausa em segundo plano.
 - **Depuração:** `window.__azulejaria` expõe `S`, `fits`, `anyFit`, `fullLines`, `place`, `revive` e `FAMILIES` para testes automatizados.
