@@ -83,24 +83,46 @@
   // Há um vídeo premiado disponível agora?
   function premiadoDisponivel() { return AdMob ? premiadoCarregado : true; }
 
-  // Mostra o vídeo premiado. Resolve true só se o jogador assistiu até ganhar a recompensa.
+  // Mostra o vídeo premiado. Resolve true assim que o jogador ganha a recompensa.
+  // Não depende só do evento de "fechou o vídeo": alguns celulares não entregam esse
+  // evento ao jogo, e a partida ficava presa em "Carregando vídeo...". Por isso também
+  // resolve quando o app volta para a frente, e há um limite de tempo de segurança.
   function mostrarPremiado() {
     if (!AdMob) { console.log("[ads] (simulado) vídeo premiado"); return Promise.resolve(true); }
     if (!premiadoCarregado) return Promise.resolve(false);
     premiadoCarregado = false;
     return new Promise((resolve) => {
-      let ganhou = false, fim = false;
+      let ganhou = false, fim = false, mostrou = false, timer = 0, inicio = 0;
       const handles = [];
-      const terminar = () => {
+      const aoVoltar = () => {
+        if (document.hidden) { if (!mostrou) inicio = Date.now(); mostrou = true; return; }
+        if (mostrou) setTimeout(() => terminar("voltou"), 1500);
+      };
+      const terminar = (motivo) => {
         if (fim) return; fim = true;
-        handles.forEach((h) => h.then((x) => x && x.remove && x.remove()));
+        clearTimeout(timer);
+        // Se o aviso de recompensa se perdeu mas o vídeo ficou na tela por 15 s ou mais,
+        // o jogador quase certamente assistiu: a favor do jogador.
+        if (!ganhou && mostrou && inicio && Date.now() - inicio >= 15000) { ganhou = true; motivo = (motivo || "") + "+tempo"; }
+        document.removeEventListener("visibilitychange", aoVoltar);
+        window.removeEventListener("focus", aoVoltar);
+        handles.forEach((h) => Promise.resolve(h).then((x) => x && x.remove && x.remove()).catch(() => {}));
+        if (window.Metricas) Metricas.evento("premiado_fim", { ganhou: ganhou ? 1 : 0, motivo: motivo || "" });
         carregarPremiado();
         resolve(ganhou);
       };
-      handles.push(AdMob.addListener("onRewardedVideoAdReward", () => { ganhou = true; }));
-      handles.push(AdMob.addListener("onRewardedVideoAdDismissed", () => setTimeout(terminar, 150)));
-      handles.push(AdMob.addListener("onRewardedVideoAdFailedToShow", terminar));
-      AdMob.showRewardVideoAd().then((item) => { if (item) ganhou = true; }).catch(terminar);
+      const recompensa = (motivo) => { ganhou = true; terminar(motivo); };
+      const on = (ev, fn) => { try { handles.push(AdMob.addListener(ev, fn)); } catch (e) {} };
+      on("onRewardedVideoAdReward", () => recompensa("evento"));
+      on("onRewardedVideoAdShowed", () => { if (!mostrou) inicio = Date.now(); mostrou = true; });
+      on("onRewardedVideoAdDismissed", () => setTimeout(() => terminar("fechou"), 300));
+      on("onRewardedVideoAdFailedToShow", () => terminar("falhou"));
+      document.addEventListener("visibilitychange", aoVoltar);
+      window.addEventListener("focus", aoVoltar);
+      timer = setTimeout(() => terminar("tempo"), 120000);
+      AdMob.showRewardVideoAd()
+        .then((item) => { mostrou = true; if (item) recompensa("retorno"); })
+        .catch(() => terminar("erro"));
     });
   }
 

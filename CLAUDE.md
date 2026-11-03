@@ -90,6 +90,7 @@ O build de release (.aab) é feito no Android Studio: **Build → Generate Signe
 - **Menu inicial:** `#menu` abre ao iniciar o app (Jogar/Continuar partida, Nova partida, Recordes, som). O botão "Menu" no rodapé volta a ele.
 - **Ranking local:** as 10 melhores partidas ficam em `azulejaria-ranking` (`{id,p,d}`), gravadas no fim de jogo (`registrarRank`).
 - **Continuar sem internet:** se o vídeo premiado não carregar em 6 s, o botão vira "Continuar" grátis (uma vez por partida), para nunca travar o jogo offline.
+- **Vídeo premiado robusto (`mostrarPremiado`):** resolve `true` assim que chega a recompensa (evento ou retorno de `showRewardVideoAd`), sem esperar o "fechou". Se nenhum evento chegar, resolve quando o app volta para a frente (`visibilitychange`/`focus`) ou em 120 s; se o vídeo ficou 15 s ou mais na tela, conta como assistido. Evento `premiado_fim` {ganhou,motivo} no Firebase.
 - **Desafio diário:** `S.modo="diario"`, estado em `azulejaria-estado-diario`. Peças de gerador com semente pela data (`rnd()`, `S.rng`), igual para todos; meta 300–500 (`S.meta`). Sequência de dias em `azulejaria-sequencia` `{n,ultimo,max}`. Não conta para recorde/ranking.
 - **Fúria de combo:** com `S.combo >= 5` os pontos dobram e o painel brilha dourado.
 - **Perigo:** com 14 ou menos casas livres o painel pulsa vermelho e toca `Sons.perigo()` uma vez.
