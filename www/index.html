@@ -182,6 +182,38 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
 #abertura.sai{opacity:0}
 @keyframes marca{0%{opacity:0;transform:scale(.88);filter:blur(6px)}30%{opacity:1;transform:scale(1);filter:blur(0)}100%{opacity:1;transform:scale(1.03)}}
 @media (prefers-reduced-motion: reduce){#abertura img{animation:none;opacity:1;transform:none}}
+/* temas de azulejo (liberados pelo recorde) */
+html.tema-noite{--t1:#5B6CFF;--t2:#E8B04A;--t3:#2FB59A;--t4:#D04A9C;--t5:#6FC6F0}
+html.tema-sevilha{--t1:#E2572B;--t2:#F5C518;--t3:#2E9E5B;--t4:#2B5FD9;--t5:#F08A24}
+html.tema-porto{--t1:#7AA2FF;--t2:#FFD36E;--t3:#72DDAE;--t4:#CDA2FF;--t5:#86E8F2}
+/* fúria de combo e perigo */
+.boardwrap.furia{box-shadow:0 0 0 2px var(--gold),0 0 24px 6px rgba(255,201,60,.75),0 5px 0 rgba(4,12,52,.6)}
+.boardwrap.furia #board{animation:furia .9s ease-in-out infinite alternate}
+@keyframes furia{to{box-shadow:0 0 0 2.5px #fff,0 0 0 4px var(--gold),inset 0 0 26px rgba(255,201,60,.55)}}
+.boardwrap.perigo{animation:perigo 1.1s ease-in-out infinite}
+@keyframes perigo{50%{box-shadow:0 0 0 2px #FF4D4D,0 0 22px 4px rgba(255,60,60,.6),0 5px 0 rgba(4,12,52,.6)}}
+#trocar{font-size:.8rem}
+/* menu: linha de botões pequenos */
+#menu .linha{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+#menu .linha button{font-size:.78rem;padding:11px 4px}
+#mDesafio{background:linear-gradient(180deg,#FFD95A,#F5A623);color:#5A2A00;text-shadow:none;box-shadow:0 4px 0 #A65F00,0 6px 12px rgba(0,0,0,.25)}
+#mDesafio small{display:block;font-size:.72rem;font-weight:700;opacity:.85;margin-top:2px}
+/* cartões genéricos (estatísticas, ajustes, lembrete) */
+.painelc{position:fixed;inset:0;z-index:58;background:rgba(2,8,40,.6);display:flex;align-items:center;justify-content:center;padding:24px}
+.painelc .cartao{padding:28px 20px 18px;width:min(310px,100%);display:flex;flex-direction:column;gap:12px;max-height:88dvh;overflow:auto}
+.painelc h2{font-family:var(--f-display);font-weight:400;font-size:1.5rem;margin:0}
+.dados{display:grid;grid-template-columns:1fr auto;gap:6px 12px;text-align:left;font-variant-numeric:tabular-nums}
+.dados span{color:#5B6FA8;font-weight:600}.dados b{font-size:1.05rem}
+.opcao{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;font-weight:700}
+.chave{width:48px;height:28px;border-radius:999px;padding:0;background:#C9C2B2;box-shadow:none;position:relative;flex-shrink:0}
+.chave::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s}
+.chave[aria-checked="true"]{background:#16C47A}.chave[aria-checked="true"]::after{left:23px}
+.opcao select{font:inherit;padding:6px;border-radius:8px;border:2px solid var(--cobalt);color:var(--cobalt-ink);background:#fff}
+.temas{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.temas button{padding:8px 6px;font-size:.78rem;display:flex;flex-direction:column;align-items:center;gap:5px;background:#fff;color:var(--cobalt-ink);box-shadow:inset 0 0 0 2px #D8D0BE;text-shadow:none}
+.temas button[aria-pressed="true"]{box-shadow:inset 0 0 0 3px var(--cobalt)}
+.temas button:disabled{opacity:.55}
+.temas i{display:flex;gap:2px}.temas i b{width:12px;height:12px;border-radius:3px}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion: reduce){.cell.burst,.float,.cell.pop,.piece.chega,#over .cartao,.num.sobe{animation-duration:.01s;animation-delay:0s}.cell.willclear::after{animation:none}}
 </style>
@@ -189,6 +221,7 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
 <script src="ads.js"></script>
 <script src="sons.js"></script>
 <script src="idioma.js"></script>
+<script src="metricas.js"></script>
 </head>
 <body>
 <div id="abertura" aria-label="SixPAC Games"><img src="img/sixpac.webp" alt="SixPAC Games"></div>
@@ -241,6 +274,7 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
   <div class="foot">
     <span id="dica"></span>
     <div class="btns">
+      <button class="mini" id="trocar" type="button" data-t="trocar" data-t-aria="trocarAria" hidden>▶ Trocar</button>
       <button class="mini" id="abrirMenu" type="button" data-t="menu">Menu</button>
       <button class="mini" id="restart" type="button" data-t="recomecar">Recomeçar</button>
     </div>
@@ -262,7 +296,12 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
   <div class="acoes">
     <button id="mJogar" type="button" data-t="jogar">Jogar</button>
     <button id="mNova" type="button" class="claro" data-t="novaPartida" hidden>Nova partida</button>
-    <button id="mRank" type="button" class="claro" data-t="recordes">Recordes</button>
+    <button id="mDesafio" type="button"><span data-t="desafio">Desafio diário</span><small id="mDesafioInfo"></small></button>
+    <div class="linha">
+      <button id="mRank" type="button" class="claro" data-t="recordes">Recordes</button>
+      <button id="mStats" type="button" class="claro" data-t="estatisticas">Estatísticas</button>
+      <button id="mAjustes" type="button" class="claro" data-t="ajustes">Ajustes</button>
+    </div>
   </div>
 </div>
 
@@ -271,6 +310,34 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
     <h2 data-t="seusRecordes">Seus recordes</h2>
     <ol id="rankLista"></ol><div id="rankVazio" data-t="semRecordes" hidden></div>
     <div class="row" style="display:flex;justify-content:center"><button id="rankFechar" type="button" data-t="fechar">Fechar</button></div>
+  </div>
+</div>
+
+<div id="stats" class="painelc" hidden role="dialog" aria-modal="true">
+  <div class="cartao">
+    <h2 data-t="estatisticas">Estatísticas</h2>
+    <div class="dados" id="statsDados"></div>
+    <div style="display:flex;justify-content:center"><button class="fechaPainel" type="button" data-t="fechar">Fechar</button></div>
+  </div>
+</div>
+
+<div id="ajustes" class="painelc" hidden role="dialog" aria-modal="true">
+  <div class="cartao">
+    <h2 data-t="ajustes">Ajustes</h2>
+    <div class="opcao"><span data-t="som">Som</span><button class="chave" id="ajSom" type="button" role="switch" data-t-aria="som"></button></div>
+    <div class="opcao"><span data-t="vibracao">Vibração</span><button class="chave" id="ajVibrar" type="button" role="switch" data-t-aria="vibracao"></button></div>
+    <div class="opcao"><span data-t="lembrete">Lembrete diário</span><button class="chave" id="ajLembrete" type="button" role="switch" data-t-aria="lembrete"></button></div>
+    <div class="opcao"><span data-t="idioma">Idioma</span><select id="ajIdioma"><option value="" data-t="automatico">Automático</option><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></div>
+    <div style="text-align:left;font-weight:700" data-t="tema">Tema dos azulejos</div>
+    <div class="temas" id="ajTemas"></div>
+    <div style="display:flex;justify-content:center"><button class="fechaPainel" type="button" data-t="fechar">Fechar</button></div>
+  </div>
+</div>
+
+<div id="pedeLembrete" class="painelc" hidden role="dialog" aria-modal="true">
+  <div class="cartao">
+    <div style="font-weight:700;font-size:1rem" data-t="querLembrete">Quer um lembrete diário do desafio?</div>
+    <div style="display:flex;gap:10px;justify-content:center"><button class="claro" id="lemNao" type="button" data-t="agoraNao">Agora não</button><button id="lemSim" type="button" data-t="sim">Sim</button></div>
   </div>
 </div>
 
@@ -292,11 +359,13 @@ function norm(c){const my=Math.min(...c.map(p=>p[0])),mx=Math.min(...c.map(p=>p[
 function rot(c){return norm(c.map(([y,x])=>[x,-y]))}
 const FAMILIES=BASES.map(b=>{let c=norm(parse(b));const out=[],seen=new Set();for(let i=0;i<4;i++){const k=JSON.stringify(c);if(!seen.has(k)){seen.add(k);out.push(c)}c=rot(c)}return out});
 function dims(c){return[Math.max(...c.map(p=>p[0]))+1,Math.max(...c.map(p=>p[1]))+1]}
-function pick(a){return a[Math.floor(Math.random()*a.length)]}
+/* no desafio diário as peças vêm de um gerador com semente: o mesmo dia dá as mesmas peças para todos */
+function rnd(){if(S&&S.modo==="diario"){let t=(S.rng=(S.rng+0x6D2B79F5)>>>0);t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}return Math.random()}
+function pick(a){return a[Math.floor(rnd()*a.length)]}
 /* cores liberadas aos poucos: começa só com o cobalto e ganha uma cor nova a cada marco de pontos */
 const MARCOS_COR=[0,100,300,600,1000];
 function coresAte(p){return MARCOS_COR.filter(m=>p>=m).length}
-function randPiece(fams){const f=pick(fams||FAMILIES);const n=S?coresAte(S.score):1;return{cells:pick(f),color:1+Math.floor(Math.random()*n)}}
+function randPiece(fams){const f=pick(fams||FAMILIES);const n=S?coresAte(S.score):1;return{cells:pick(f),color:1+Math.floor(rnd()*n)}}
 
 const $=id=>document.getElementById(id);
 const boardEl=$("board"),trayEl=$("tray");
@@ -313,8 +382,17 @@ function anyFit(grid,p){for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(fits(grid,p.c
 function fullLines(grid){const rows=[],cols=[];for(let r=0;r<N;r++){let f=true;for(let c=0;c<N;c++)if(!grid[r*N+c]){f=false;break}if(f)rows.push(r)}
   for(let c=0;c<N;c++){let f=true;for(let r=0;r<N;r++)if(!grid[r*N+c]){f=false;break}if(f)cols.push(c)}return{rows,cols}}
 
-function save(){store.set("azulejaria-estado",JSON.stringify(S))}
-function newGame(){S=null;S={id:Date.now(),grid:Array(N*N).fill(0),tray:[randPiece(),randPiece(),randPiece()],score:0,combo:0,since:0,over:false,revived:false,recordeAvisado:false};trayNova=true;save();render()}
+function chaveEstado(m){return m==="diario"?"azulejaria-estado-diario":"azulejaria-estado"}
+function save(){store.set(chaveEstado(S.modo),JSON.stringify(S))}
+function hoje(d){d=d||new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function hashTxt(t){let h=2166136261;for(const ch of t){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function carregar(m){try{const s=JSON.parse(store.get(chaveEstado(m)));if(s&&Array.isArray(s.grid)&&s.grid.length===N*N&&Array.isArray(s.tray)&&(m!=="diario"||s.dia===hoje()))return s}catch(e){}return null}
+function newGame(modo){modo=modo||(S&&S.modo)||"classico";S=null;
+  const base={id:Date.now(),modo,grid:Array(N*N).fill(0),tray:[],score:0,combo:0,since:0,over:false,revived:false,recordeAvisado:false};
+  if(modo==="diario"){const dia=hoje(),seed=hashTxt("azulejaria-"+dia);Object.assign(base,{dia,rng:seed,meta:300+(seed%5)*50,metaOk:false});S=base}
+  else S=base;
+  S.tray=[randPiece(),randPiece(),randPiece()];trayNova=true;save();render();
+  if(window.Metricas)Metricas.evento("partida_inicio",{modo})}
 
 function renderBoard(prev){
   const g=S.grid;let clearSet=null,prevSet=null;
@@ -333,12 +411,20 @@ function renderTray(){trayEl.innerHTML="";const slotW=trayEl.clientWidth/3-10;
     if(p){const sz=Math.min(22,Math.floor((slotW-8)/5));const el=pieceEl(p,sz,2);if(trayNova)el.classList.add("chega");s.appendChild(el);if(!anyFit(S.grid,p))s.classList.add("dead")}
     trayEl.appendChild(s)});trayNova=false}
 let ultimoPlacar=-1;
-function renderHud(){const sc=$("score");sc.textContent=S.score;$("best").textContent=Math.max(best,S.score);
+function renderHud(){const sc=$("score");sc.textContent=S.score;
+  $("best").textContent=S.modo==="diario"?(S.metaOk?"✓ ":"🎯 ")+S.meta:Math.max(best,S.score);
+  document.querySelector(".recorde svg").style.display=S.modo==="diario"?"none":"";
+  document.querySelector(".recorde").title=S.modo==="diario"?T("meta"):T("recorde");
+  const bw=document.querySelector(".boardwrap");bw.classList.toggle("furia",S.combo>=5&&!S.over);
+  const livres=S.grid.filter(v=>!v).length;bw.classList.toggle("perigo",!S.over&&livres<=14);
+  atualizaTrocar();
   if(ultimoPlacar>=0&&S.score>ultimoPlacar){sc.classList.remove("sobe");void sc.offsetWidth;sc.classList.add("sobe")}ultimoPlacar=S.score;
   const vazio=S.score===0&&S.grid.every(v=>!v);
   $("dica").innerHTML=vazio?T("dica"):T("combo")+' <span id="comboTag" class="'+(S.combo>1?"":"zero")+'">'+(S.combo>1?"×"+S.combo:"—")+"</span>"}
 function renderOver(){$("over").hidden=!S.over;if(!S.over)return;$("final").textContent=S.score;
-  const fb=$("finalBest"),novo=S.score>=best&&S.score>0;fb.textContent=novo?T("novoRecorde"):T("recorde")+": "+best;fb.classList.toggle("novo",novo);
+  const fb=$("finalBest"),novo=S.modo!=="diario"&&S.score>=best&&S.score>0;
+  fb.textContent=S.modo==="diario"?(S.metaOk?T("desafioOk"):T("meta")+": "+S.meta):novo?T("novoRecorde"):T("recorde")+": "+best;fb.classList.toggle("novo",novo||!!S.metaOk);
+  $("again").textContent=S.modo==="diario"?T("tentarDeNovo"):T("novaPartida");
   atualizaRevive()}
 /* "Continuar": espera o vídeo carregar; sem internet, libera uma segunda chance grátis */
 let overDesde=0,reviveTimer=0;
@@ -354,7 +440,7 @@ function render(){renderBoard();renderTray();renderHud();renderOver()}
 function floatText(main,sub,grande){const f=document.createElement("div");f.className="float"+(grande?" grande":"");
   f.innerHTML="<b>"+main+"</b>"+(sub?"<small>"+sub+"</small>":"");
   document.querySelector(".boardwrap").appendChild(f);setTimeout(()=>f.remove(),1100)}
-function bumpBest(){if(S.score>best){best=S.score;store.set("azulejaria-best",best)}}
+function bumpBest(){if(S.modo==="diario")return;if(S.score>best){best=S.score;store.set("azulejaria-best",best)}}
 
 /* estilhaços de azulejo ao limpar linhas */
 const fx=$("fx"),fxc=fx.getContext("2d");let parts=[],fxOn=false,dpr=1;
@@ -381,34 +467,45 @@ function place(i,r,c){const p=S.tray[i];const postos=p.cells.map(([y,x])=>(r+y)*
   let gain=p.cells.length;const{rows,cols}=fullLines(S.grid);const lines=rows.length+cols.length;
   if(lines){S.combo++;S.since=0;const burst=new Set();rows.forEach(rr=>{for(let x=0;x<N;x++)burst.add(rr*N+x)});cols.forEach(cc=>{for(let y=0;y<N;y++)burst.add(y*N+cc)});
     gain+=lines*10*(lines>1?lines:1)*Math.max(1,S.combo);
+    if(S.combo>=5)gain*=2;
+    est.linhas+=lines;est.combo=Math.max(est.combo,S.combo);
     const cacos=[];burst.forEach(k=>{cacos.push([k,S.grid[k]]);cellEls[k].className="cell t"+S.grid[k]+" burst";S.grid[k]=0});
     estilhacos(cacos);
     setTimeout(()=>{burst.forEach(k=>cellEls[k].classList.remove("burst"));renderBoard()},420);
-    const limpo=S.grid.every(v=>!v);if(limpo)gain+=300;
+    const limpo=S.grid.every(v=>!v);if(limpo){gain+=300;est.limpos++}
     const s=som();if(s){s.encaixar(p.cells.length);s.limpar(lines,S.combo);if(limpo)s.painelLimpo()}
-    if(navigator.vibrate)try{navigator.vibrate(lines>1?[20,40,30]:15)}catch(e){}
+    vibrar(lines>1?[20,40,30]:15);
     const combo=S.combo>1?" · "+T("combo")+" ×"+S.combo:"";
     if(limpo)floatText(T("painelLimpo"),"+"+gain+combo,true);
     else if(lines>1)floatText(ELOGIOS[Math.min(lines,4)],"+"+gain+combo,lines>=3);
+    else if(S.combo===5){floatText(T("furia"),"+"+gain,true);const so=som();if(so)so.furia()}
     else if(S.combo>1)floatText(T("combo")+" ×"+S.combo,"+"+gain);
     else floatText("+"+gain,"")}
   else{S.since++;if(S.since>=3)S.combo=0;const s=som();if(s)s.encaixar(p.cells.length)}
   const antes=S.score;S.score+=gain;
   if(coresAte(S.score)>coresAte(antes))setTimeout(()=>floatText(T("novaCor"),"",false),lines?1250:200);
-  if(best>0&&antes<=best&&S.score>best&&!S.recordeAvisado){S.recordeAvisado=true;setTimeout(()=>{floatText(T("novoRecorde"),"",true);const s=som();if(s)s.recorde()},lines?900:150)}
-  bumpBest();
+  if(S.modo!=="diario"&&best>0&&antes<=best&&S.score>best&&!S.recordeAvisado){S.recordeAvisado=true;setTimeout(()=>{floatText(T("novoRecorde"),"",true);const s=som();if(s)s.recorde()},lines?900:150)}
+  if(S.modo==="diario"&&!S.metaOk&&S.score>=S.meta){S.metaOk=true;const n=marcarSequencia();
+    setTimeout(()=>{floatText(T("desafioOk"),T("diasSeguidos").replace("{n}",n),true);const so=som();if(so)so.recorde()},lines?900:150);
+    if(window.Metricas)Metricas.evento("desafio_concluido",{sequencia:n})}
+  const bestAntes=best;bumpBest();
+  if(TEMAS.some(t=>t.min>bestAntes&&t.min<=best))setTimeout(()=>floatText(T("temaNovo"),"",false),1600);
+  salvaEst();
   if(S.tray.every(t=>!t)){S.tray=[randPiece(),randPiece(),randPiece()];trayNova=true}
   if(!S.tray.some(t=>t&&anyFit(S.grid,t)))S.over=true;
   save();renderBoard();
   postos.forEach(k=>{if(S.grid[k]){const el=cellEls[k];el.classList.remove("pop");void el.offsetWidth;el.classList.add("pop");setTimeout(()=>el.classList.remove("pop"),240)}});
   renderTray();renderHud();
-  if(S.over){registrarRank();setTimeout(()=>{renderOver();const s=som();if(s){if(S.score>=best&&S.score>0)s.recorde();else s.fimDeJogo()}},600)}}
+  const livres=S.grid.filter(v=>!v).length;
+  if(!S.over&&livres<=14&&!S.perigoAvisado){S.perigoAvisado=true;const so=som();if(so)so.perigo();vibrar([30,60,30])}
+  if(livres>20)S.perigoAvisado=false;
+  if(S.over){registrarRank();fimDePartida();setTimeout(()=>{renderOver();const s=som();if(s){if(S.modo!=="diario"&&S.score>=best&&S.score>0)s.recorde();else s.fimDeJogo()}},600)}}
 
 /* Continuar: 3 peças pequenas que cabem no tabuleiro, uma vez por partida */
 function revive(){overDesde=0;const fams=PEQUENAS.map(k=>FAMILIES[k]);const out=[];
   for(let n=0;n<3;n++){let p,t=0;do{p=randPiece(fams);t++}while(!anyFit(S.grid,p)&&t<40);out.push(p)}
   S.tray=out;S.over=false;S.revived=true;trayNova=true;save();render()}
-$("revive").onclick=async()=>{const b=$("revive");if(b.dataset.gratis){revive();return}
+$("revive").onclick=async()=>{const b=$("revive");if(window.Metricas)Metricas.evento("continuar",{tipo:b.dataset.gratis?"gratis":"video"});if(b.dataset.gratis){revive();return}
   b.disabled=true;b.dataset.ocupado="1";b.querySelector("span").textContent=T("carregando");
   const ok=await Anuncios.mostrarPremiado();b.dataset.ocupado="";if(ok)revive();else renderOver()};
 
@@ -444,14 +541,36 @@ window.addEventListener("resize",()=>renderTray());
 /* avaliar e compartilhar (só no fim de jogo) */
 const LOJA="https://play.google.com/store/apps/details?id=io.github.arthursn93.azulejaria";
 $("avaliar").onclick=()=>window.open(LOJA,"_blank");
-$("compartilhar").onclick=async()=>{const txt=T("convite").replace("{p}",S.score);
+/* imagem do resultado: o painel, a pontuação e o nome do jogo, num cartão 1080x1350 */
+function imagemResultado(){const W=1080,H=1350,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
+  const fundo=g.createLinearGradient(0,0,0,H);fundo.addColorStop(0,"#2D63F0");fundo.addColorStop(1,"#0A1F6B");g.fillStyle=fundo;g.fillRect(0,0,W,H);
+  const rr=(x,y,w,h,r)=>{g.beginPath();g.roundRect(x,y,w,h,r)};
+  g.textAlign="center";g.fillStyle="#FBF8F1";rr(240,70,600,140,22);g.fill();g.strokeStyle="#1C3FAA";g.lineWidth=8;rr(254,84,572,112,14);g.stroke();
+  g.fillStyle="#142E80";g.font='72px "Young Serif",Georgia,serif';g.fillText("Azulejaria",540,165);
+  g.fillStyle="#FFC93C";g.font='52px "Young Serif",Georgia,serif';g.fillText("Block Puzzle!",540,280);
+  const cs=getComputedStyle(document.documentElement),cor=n=>cs.getPropertyValue("--t"+n).trim();
+  const lado=720,x0=(W-lado)/2,y0=330,pad=22,gap=8,cel=(lado-pad*2-gap*7)/8;
+  g.fillStyle="#FBF8F1";rr(x0-14,y0-14,lado+28,lado+28,34);g.fill();g.fillStyle="#0B1B5C";rr(x0,y0,lado,lado,26);g.fill();
+  S.grid.forEach((v,i)=>{const x=x0+pad+(i%8)*(cel+gap),y=y0+pad+Math.floor(i/8)*(cel+gap);g.fillStyle=v?cor(v):"#0A1850";rr(x,y,cel,cel,12);g.fill();
+    if(v){g.fillStyle="rgba(255,255,255,.35)";rr(x,y,cel,cel*.35,12);g.fill();g.fillStyle="#fff";g.beginPath();g.arc(x+cel/2,y+cel/2,cel*.1,0,7);g.fill()}});
+  g.fillStyle="#fff";g.font='800 120px Figtree,sans-serif';g.fillText(S.score,540,1200);
+  g.fillStyle="#B9CBFF";g.font='700 40px Figtree,sans-serif';g.fillText(T("baixe"),540,1280);return c}
+async function compartilharImagem(txt){const c=imagemResultado();const P=window.Capacitor&&Capacitor.Plugins||{};
+  const dados=c.toDataURL("image/png");
+  if(P.Share&&P.Filesystem){const r=await P.Filesystem.writeFile({path:"azulejaria-resultado.png",data:dados.split(",")[1],directory:"CACHE"});
+    await P.Share.share({text:txt+" "+LOJA,files:[r.uri]});return true}
+  if(navigator.canShare){const blob=await (await fetch(dados)).blob();const f=new File([blob],"azulejaria.png",{type:"image/png"});
+    if(navigator.canShare({files:[f]})){await navigator.share({files:[f],text:txt+" "+LOJA});return true}}
+  return false}
+$("compartilhar").onclick=async()=>{const txt=T("convite").replace("{p}",S.score);if(window.Metricas)Metricas.evento("compartilhar",{pontos:S.score});
+  try{if(await compartilharImagem(txt))return}catch(e){}
   try{const P=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Share;
     if(P)await P.share({text:txt,url:LOJA});else if(navigator.share)await navigator.share({text:txt,url:LOJA});
     else window.open(LOJA,"_blank")}catch(e){}};
 
 /* ranking local: as 10 melhores partidas, guardadas no aparelho */
 function lerRank(){try{const r=JSON.parse(store.get("azulejaria-ranking"));return Array.isArray(r)?r:[]}catch(e){return[]}}
-function registrarRank(){if(!S.score)return;let r=lerRank().filter(x=>x.id!==S.id);r.push({id:S.id||Date.now(),p:S.score,d:Date.now()});
+function registrarRank(){if(!S.score||S.modo==="diario")return;let r=lerRank().filter(x=>x.id!==S.id);r.push({id:S.id||Date.now(),p:S.score,d:Date.now()});
   r.sort((a,b)=>b.p-a.p);store.set("azulejaria-ranking",JSON.stringify(r.slice(0,10)))}
 function abrirRank(){const r=lerRank(),ul=$("rankLista");ul.innerHTML="";
   r.forEach((x,i)=>{const li=document.createElement("li");if(S&&x.id===S.id)li.className="atual";
@@ -462,16 +581,87 @@ $("verRank").onclick=abrirRank;$("mRank").onclick=abrirRank;$("rankFechar").oncl
 
 /* menu inicial */
 $("menuPlaca").appendChild(document.querySelector("header .placa svg").cloneNode(true));
-function emAndamento(){return S&&!S.over&&S.score>0}
+function emAndamento(){const c=S&&S.modo!=="diario"?S:carregar("classico");return!!(c&&!c.over&&c.score>0)}
 function abrirMenu(){$("menuBest").textContent=best?T("recorde")+": "+best:"";
   $("mJogar").textContent=emAndamento()?T("continuar"):T("jogar");$("mNova").hidden=!emAndamento();
+  const feito=(lerSeq().ultimo===hoje()),n=seqAtual();
+  $("mDesafioInfo").textContent=feito?T("desafioFeito")+(n>1?" · 🔥 "+n:""):n?"🔥 "+T("diasSeguidos").replace("{n}",n):"";
   renderSomMenu();$("menu").hidden=false}
-function fecharMenu(){$("menu").hidden=true;renderTray();if(!store.get("azulejaria-tutorial")&&S.score===0){renderTuto();$("tuto").hidden=false}}
-$("mJogar").onclick=()=>{if(S.over)newGame();fecharMenu()};
-$("mNova").onclick=()=>{newGame();fecharMenu()};
+function fecharMenu(){$("menu").hidden=true;save();renderTray();if(!store.get("azulejaria-tutorial")&&S.score===0){renderTuto();$("tuto").hidden=false}}
+function entrar(modo){overDesde=0;const s=carregar(modo);if(s&&!s.over){S=s;trayNova=true;render()}else newGame(modo);fecharMenu()}
+$("mJogar").onclick=()=>entrar("classico");
+$("mNova").onclick=()=>{overDesde=0;newGame("classico");fecharMenu()};
+$("mDesafio").onclick=()=>{const s=carregar("diario");if(s&&s.over&&s.revived){S=s;render();fecharMenu();return}entrar("diario")};
 $("abrirMenu").onclick=abrirMenu;
 function renderSomMenu(){const on=!window.Sons||Sons.ligado;$("somMenu").innerHTML=on?ICONE_SOM:ICONE_MUDO;$("somMenu").setAttribute("aria-label",on?T("desligarSom"):T("ligarSom"))}
 $("somMenu").onclick=()=>{if(window.Sons)Sons.alternar();renderSom();renderSomMenu()};
+
+/* vibração (pode ser desligada nos ajustes) */
+function vibraLigado(){return store.get("azulejaria-vibrar")!=="0"}
+function vibrar(p){if(vibraLigado()&&navigator.vibrate)try{navigator.vibrate(p)}catch(e){}}
+
+/* sequência de dias do desafio diário */
+function lerSeq(){try{return JSON.parse(store.get("azulejaria-sequencia"))||{n:0,ultimo:"",max:0}}catch(e){return{n:0,ultimo:"",max:0}}}
+function ontem(){const d=new Date();d.setDate(d.getDate()-1);return hoje(d)}
+function seqAtual(){const q=lerSeq();return q.ultimo===hoje()||q.ultimo===ontem()?q.n:0}
+function marcarSequencia(){const q=lerSeq();if(q.ultimo!==hoje()){q.n=q.ultimo===ontem()?q.n+1:1;q.ultimo=hoje();q.max=Math.max(q.max||0,q.n);store.set("azulejaria-sequencia",JSON.stringify(q))}return q.n}
+
+/* estatísticas */
+let est=(()=>{try{return Object.assign({jogos:0,pontos:0,combo:0,linhas:0,limpos:0},JSON.parse(store.get("azulejaria-stats"))||{})}catch(e){return{jogos:0,pontos:0,combo:0,linhas:0,limpos:0}}})();
+function salvaEst(){store.set("azulejaria-stats",JSON.stringify(est))}
+function fimDePartida(){if(!S.contado){est.jogos++;S.contado=true}est.pontos+=S.score-(S.pontosContados||0);S.pontosContados=S.score;salvaEst();
+  if(window.Metricas)Metricas.evento("partida_fim",{modo:S.modo||"classico",pontos:S.score});
+  if(est.jogos===2&&!store.get("azulejaria-lembrete-perguntado")&&temNotif())setTimeout(()=>{$("pedeLembrete").hidden=false},1400)}
+function abrirStats(){const media=est.jogos?Math.round(est.pontos/est.jogos):0;
+  const linhas=[["stJogos",est.jogos],["stMedia",media],["stMelhor",best],["stCombo",est.combo?"×"+est.combo:"—"],["stLinhas",est.linhas],["stLimpos",est.limpos],["stSeq",lerSeq().max||0]];
+  const d=$("statsDados");d.innerHTML="";linhas.forEach(([k,v])=>{const a=document.createElement("span");a.textContent=T(k);const b=document.createElement("b");b.textContent=v;d.append(a,b)});
+  $("stats").hidden=false}
+$("mStats").onclick=abrirStats;
+document.querySelectorAll(".fechaPainel").forEach(b=>b.onclick=()=>b.closest(".painelc").hidden=true);
+
+/* temas de azulejo: liberados pelo recorde do modo clássico */
+const TEMAS=[{id:"lisboa",min:0,nome:"temaLisboa"},{id:"noite",min:1500,nome:"temaNoite"},{id:"sevilha",min:4000,nome:"temaSevilha"},{id:"porto",min:8000,nome:"temaPorto"}];
+function aplicaTema(id){TEMAS.forEach(t=>document.documentElement.classList.toggle("tema-"+t.id,t.id===id&&id!=="lisboa"))}
+function temaAtual(){const id=store.get("azulejaria-tema")||"lisboa";const t=TEMAS.find(x=>x.id===id);return t&&best>=t.min?id:"lisboa"}
+aplicaTema(temaAtual());
+function renderTemas(){const box=$("ajTemas");box.innerHTML="";const atual=temaAtual();
+  TEMAS.forEach(t=>{const b=document.createElement("button");b.type="button";b.disabled=best<t.min;b.setAttribute("aria-pressed",t.id===atual);
+    aplicaTema(t.id);const cs=getComputedStyle(document.documentElement);const i=document.createElement("i");
+    for(let k=1;k<=5;k++){const q=document.createElement("b");q.style.background=cs.getPropertyValue("--t"+k);i.appendChild(q)}
+    const n=document.createElement("span");n.textContent=b.disabled?"🔒 "+T("bloqueado").replace("{n}",t.min):T(t.nome);b.append(i,n);
+    b.onclick=()=>{store.set("azulejaria-tema",t.id);if(window.Metricas)Metricas.evento("tema_escolhido",{tema:t.id});renderTemas()};box.appendChild(b)});
+  aplicaTema(atual)}
+
+/* lembrete diário (notificação local, funciona sem internet) */
+function notif(){return window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.LocalNotifications}
+function temNotif(){return!!notif()||!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform())}
+function lembreteLigado(){return store.get("azulejaria-lembrete")==="1"}
+async function agendaLembrete(ligar){const L=notif();
+  try{if(L){await L.cancel({notifications:[{id:1}]}).catch(()=>{});
+    if(ligar){const p=await L.requestPermissions();if(p.display!=="granted")ligar=false;
+      else await L.schedule({notifications:[{id:1,title:"Azulejaria: Block Puzzle!",body:T("lembreteTxt"),schedule:{on:{hour:19,minute:0},allowWhileIdle:true}}]})}}}
+  catch(e){ligar=false}
+  store.set("azulejaria-lembrete",ligar?"1":"0");if(window.Metricas)Metricas.evento("lembrete",{ligado:ligar?1:0});renderAjustes()}
+$("lemSim").onclick=()=>{store.set("azulejaria-lembrete-perguntado","1");$("pedeLembrete").hidden=true;agendaLembrete(true)};
+$("lemNao").onclick=()=>{store.set("azulejaria-lembrete-perguntado","1");$("pedeLembrete").hidden=true};
+if(lembreteLigado())agendaLembrete(true);
+
+/* ajustes */
+function renderAjustes(){$("ajSom").setAttribute("aria-checked",!window.Sons||Sons.ligado);$("ajVibrar").setAttribute("aria-checked",vibraLigado());
+  $("ajLembrete").setAttribute("aria-checked",lembreteLigado());$("ajLembrete").closest(".opcao").hidden=!temNotif();
+  $("ajIdioma").value=store.get("azulejaria-idioma")||"";renderTemas()}
+$("mAjustes").onclick=()=>{renderAjustes();$("ajustes").hidden=false};
+$("ajSom").onclick=()=>{if(window.Sons)Sons.alternar();renderSom();renderSomMenu();renderAjustes()};
+$("ajVibrar").onclick=()=>{store.set("azulejaria-vibrar",vibraLigado()?"0":"1");vibrar(20);renderAjustes()};
+$("ajLembrete").onclick=()=>agendaLembrete(!lembreteLigado());
+$("ajIdioma").onchange=e=>{const v=e.target.value;try{if(v)localStorage.setItem("azulejaria-idioma",v);else localStorage.removeItem("azulejaria-idioma")}catch(err){}location.reload()};
+
+/* trocar as peças com vídeo premiado: 1 vez por partida */
+function atualizaTrocar(){const b=$("trocar");b.hidden=!(S&&!S.over&&!S.trocou&&videoPronto())}
+$("trocar").onclick=async()=>{const b=$("trocar");b.disabled=true;const ok=await Anuncios.mostrarPremiado();b.disabled=false;
+  if(ok){const out=[];for(let n=0;n<3;n++){let p,t=0;do{p=randPiece();t++}while(!anyFit(S.grid,p)&&t<60);out.push(p)}
+    S.tray=out;S.trocou=true;trayNova=true;save();if(window.Metricas)Metricas.evento("trocar_pecas",{})}render()};
+setInterval(()=>{if(S)atualizaTrocar()},2000);
 
 /* tutorial de 3 passos, só na primeira vez */
 let tutoI=0;
@@ -482,13 +672,13 @@ $("tutoProx").onclick=()=>{if(tutoI<2){tutoI++;renderTuto()}else fechaTuto()};
 $("tutoPular").onclick=fechaTuto;
 
 /* retoma a partida salva ao reabrir o app */
-try{const s=JSON.parse(store.get("azulejaria-estado"));if(s&&Array.isArray(s.grid)&&s.grid.length===N*N&&Array.isArray(s.tray)){S=s;render()}else newGame()}catch(e){newGame()}
+{const s=carregar("classico");if(s){S=s;render()}else newGame("classico")}
 abrirMenu();
 /* fecha a abertura depois de ~1,8 s ou no primeiro toque */
 (function(){const a=$("abertura");if(!a)return;let ok=false;
   function fim(){if(ok)return;ok=true;a.classList.add("sai");setTimeout(()=>a.remove(),380)}
   a.addEventListener("pointerdown",fim);setTimeout(fim,reduz.matches?900:1800)})();
-window.__azulejaria={get S(){return S},fits,anyFit,fullLines,place,revive,FAMILIES,coresAte,lerRank};
+window.__azulejaria={get S(){return S},imagemResultado,newGame,entrar,lerSeq,get est(){return est},fits,anyFit,fullLines,place,revive,FAMILIES,coresAte,lerRank};
 })();
 </script>
 </body>

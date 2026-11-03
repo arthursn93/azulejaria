@@ -5,6 +5,8 @@
 #   - azulejaria-apk: arquivo .apk para instalar direto no seu celular e testar
 # Assinatura: usa os segredos KEYSTORE_BASE64 e KEYSTORE_PASSWORD
 # (Settings > Secrets and variables > Actions). Sem eles, gera só um APK de teste.
+# Firebase (métricas): segredo GOOGLE_SERVICES_JSON com o conteúdo do arquivo google-services.json.
+# Sem ele, o app é gerado sem Firebase (os plugins são retirados para não travar).
 name: Gerar app Android
 
 on:
@@ -24,6 +26,7 @@ jobs:
     timeout-minutes: 30
     env:
       TEM_CHAVE: ${{ secrets.KEYSTORE_BASE64 != '' }}
+      TEM_FIREBASE: ${{ secrets.GOOGLE_SERVICES_JSON != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -46,10 +49,17 @@ jobs:
             const fs=require("fs");const c=JSON.parse(fs.readFileSync("admob.config.json","utf8"));
             c.modoTeste=false;fs.writeFileSync("admob.config.json",JSON.stringify(c,null,2));'
 
+      - name: Retirar Firebase (sem google-services.json)
+        if: env.TEM_FIREBASE != 'true'
+        run: npm uninstall --no-save @capacitor-firebase/analytics @capacitor-firebase/crashlytics
+
       - name: Criar projeto Android
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
           npm run preparar
           npx cap add android
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json; fi
           node scripts/configurar-android.mjs
           npx capacitor-assets generate --android
 

@@ -12,8 +12,12 @@
   },
   "dependencies": {
     "@capacitor-community/admob": "^8.0.0",
+    "@capacitor-firebase/analytics": "^8.6.0",
+    "@capacitor-firebase/crashlytics": "^8.6.0",
     "@capacitor/android": "^8.0.0",
     "@capacitor/core": "^8.0.0",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/local-notifications": "^8.3.1",
     "@capacitor/share": "^8.0.3",
     "@fontsource/figtree": "^5.0.0",
     "@fontsource/young-serif": "^5.0.0"

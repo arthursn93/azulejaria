@@ -27,6 +27,20 @@ if (!xml.includes("android:screenOrientation")) {
 writeFileSync(manifesto, xml);
 console.log("AndroidManifest.xml configurado (AdMob App ID + retrato).");
 
+// Firebase Crashlytics: só quando existe google-services.json (Analytics já é ligado pelo Capacitor)
+if (existsSync(join(raiz, "android/app/google-services.json"))) {
+  const raizGradle = join(raiz, "android/build.gradle");
+  let g = readFileSync(raizGradle, "utf8");
+  if (!g.includes("firebase-crashlytics-gradle")) {
+    g = g.replace(/(classpath ['"]com\.google\.gms:google-services:[^'"]+['"])/, `$1\n        classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.6'`);
+    writeFileSync(raizGradle, g);
+  }
+  const appGradle = join(raiz, "android/app/build.gradle");
+  let a = readFileSync(appGradle, "utf8");
+  if (!a.includes("com.google.firebase.crashlytics")) writeFileSync(appGradle, a + "\napply plugin: 'com.google.firebase.crashlytics'\n");
+  console.log("Firebase configurado (google-services.json + Crashlytics).");
+}
+
 const vars = join(raiz, "android/variables.gradle");
 if (existsSync(vars)) {
   const m = readFileSync(vars, "utf8").match(/targetSdkVersion\s*=\s*(\d+)/);

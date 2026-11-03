@@ -144,6 +144,16 @@
       [7, 5, 3, 2, 0].forEach((s, i) => dedilhar(semitom(s), t + i * 0.17, 0.38));
       dedilhar(semitom(-12), t + 0.85, 0.3);
     },
+    perigo() {
+      if (!pronto()) return; const t = ctx.currentTime;
+      // dois pulsos graves, como um coração acelerado
+      tom(semitom(-24), t, 0.14, 0.12, "triangle");
+      tom(semitom(-23), t + 0.18, 0.18, 0.12, "triangle");
+    },
+    furia() {
+      if (!pronto()) return; const t = ctx.currentTime + 0.1;
+      [0, 7, 12, 19, 24].forEach((s, i) => dedilhar(semitom(s), t + i * 0.04, 0.34));
+    },
     recorde() {
       if (!pronto()) return; const t = ctx.currentTime;
       [0, 4, 7, 9, 12, 16].forEach((s, i) => dedilhar(semitom(s), t + i * 0.07, 0.38));

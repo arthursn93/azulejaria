@@ -90,6 +90,14 @@ O build de release (.aab) é feito no Android Studio: **Build → Generate Signe
 - **Menu inicial:** `#menu` abre ao iniciar o app (Jogar/Continuar partida, Nova partida, Recordes, som). O botão "Menu" no rodapé volta a ele.
 - **Ranking local:** as 10 melhores partidas ficam em `azulejaria-ranking` (`{id,p,d}`), gravadas no fim de jogo (`registrarRank`).
 - **Continuar sem internet:** se o vídeo premiado não carregar em 6 s, o botão vira "Continuar" grátis (uma vez por partida), para nunca travar o jogo offline.
+- **Desafio diário:** `S.modo="diario"`, estado em `azulejaria-estado-diario`. Peças de gerador com semente pela data (`rnd()`, `S.rng`), igual para todos; meta 300–500 (`S.meta`). Sequência de dias em `azulejaria-sequencia` `{n,ultimo,max}`. Não conta para recorde/ranking.
+- **Fúria de combo:** com `S.combo >= 5` os pontos dobram e o painel brilha dourado.
+- **Perigo:** com 14 ou menos casas livres o painel pulsa vermelho e toca `Sons.perigo()` uma vez.
+- **Trocar peças:** botão "▶ Trocar" (vídeo premiado, 1x por partida, `S.trocou`); só aparece com vídeo carregado.
+- **Estatísticas:** `azulejaria-stats` `{jogos,pontos,combo,linhas,limpos}`. **Temas:** paletas `html.tema-*` liberadas pelo recorde (0/1500/4000/8000), chave `azulejaria-tema`.
+- **Ajustes:** som, vibração (`azulejaria-vibrar`), lembrete diário às 19h (`@capacitor/local-notifications`, `azulejaria-lembrete`), idioma (`azulejaria-idioma`, recarrega a página) e tema.
+- **Compartilhar:** gera imagem 1080×1350 (`imagemResultado()`) e envia com `@capacitor/filesystem` + `@capacitor/share`; cai para texto se falhar.
+- **Métricas:** `www/metricas.js` (`window.Metricas.evento`) usa `@capacitor-firebase/analytics` e `crashlytics`. Só ativa se o segredo `GOOGLE_SERVICES_JSON` existir no GitHub; sem ele o workflow remove os plugins.
 - **Persistência:** `localStorage` com as chaves `azulejaria-estado` (partida atual) e `azulejaria-best` (recorde). Sempre em try/catch.
 - **Sons (`www/sons.js`):** sintetizados na hora com Web Audio, sem arquivos de áudio e 100% originais. Identidade sonora: azulejo + guitarra portuguesa (cordas de aço em pares, algoritmo Karplus-Strong). Encaixe = "clinc" de cerâmica; limpar = notas dedilhadas na pentatônica de Lá que sobem com o combo; painel limpo = acorde rasgado; recorde = arpejo; fim de jogo = descida em Lá menor harmônico ("suspiro" de fado). Botão de alto-falante no topo, salvo na chave `azulejaria-som`. O áudio começa após o primeiro toque e pausa em segundo plano.
 - **Depuração:** `window.__azulejaria` expõe `S`, `fits`, `anyFit`, `fullLines`, `place`, `revive` e `FAMILIES` para testes automatizados.
