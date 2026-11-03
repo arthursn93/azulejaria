@@ -176,6 +176,12 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
 #rankLista li b{width:1.6em;color:#5B6FA8}#rankLista li span{flex:1;font-weight:800;font-size:1.05rem}#rankLista li small{color:#5B6FA8}
 #rankLista li.atual{background:#FFE9A8;border-radius:6px}
 #rankVazio{color:#5B6FA8;font-weight:600}
+/* abertura SixPAC Games: ~1,8 s, toque para pular */
+#abertura{position:fixed;inset:0;z-index:90;background:radial-gradient(circle at 50% 45%,#1a1d26,#07080b 70%);display:flex;align-items:center;justify-content:center;transition:opacity .35s ease}
+#abertura img{width:min(78vw,340px);height:auto;opacity:0;transform:scale(.88);animation:marca 1.45s cubic-bezier(.2,.9,.3,1) forwards}
+#abertura.sai{opacity:0}
+@keyframes marca{0%{opacity:0;transform:scale(.88);filter:blur(6px)}30%{opacity:1;transform:scale(1);filter:blur(0)}100%{opacity:1;transform:scale(1.03)}}
+@media (prefers-reduced-motion: reduce){#abertura img{animation:none;opacity:1;transform:none}}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion: reduce){.cell.burst,.float,.cell.pop,.piece.chega,#over .cartao,.num.sobe{animation-duration:.01s;animation-delay:0s}.cell.willclear::after{animation:none}}
 </style>
@@ -185,6 +191,7 @@ button.claro{background:transparent;color:var(--cobalt-ink);box-shadow:inset 0 0
 <script src="idioma.js"></script>
 </head>
 <body>
+<div id="abertura" aria-label="SixPAC Games"><img src="img/sixpac.webp" alt="SixPAC Games"></div>
 <div class="wrap">
   <header>
     <h1 class="placa" aria-label="Azulejaria">
@@ -477,6 +484,10 @@ $("tutoPular").onclick=fechaTuto;
 /* retoma a partida salva ao reabrir o app */
 try{const s=JSON.parse(store.get("azulejaria-estado"));if(s&&Array.isArray(s.grid)&&s.grid.length===N*N&&Array.isArray(s.tray)){S=s;render()}else newGame()}catch(e){newGame()}
 abrirMenu();
+/* fecha a abertura depois de ~1,8 s ou no primeiro toque */
+(function(){const a=$("abertura");if(!a)return;let ok=false;
+  function fim(){if(ok)return;ok=true;a.classList.add("sai");setTimeout(()=>a.remove(),380)}
+  a.addEventListener("pointerdown",fim);setTimeout(fim,reduz.matches?900:1800)})();
 window.__azulejaria={get S(){return S},fits,anyFit,fullLines,place,revive,FAMILIES,coresAte,lerRank};
 })();
 </script>

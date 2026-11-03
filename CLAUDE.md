@@ -86,6 +86,7 @@ O build de release (.aab) é feito no Android Studio: **Build → Generate Signe
 - **Fim de jogo:** quando nenhuma peça da bandeja cabe em lugar nenhum (`S.over = true`).
 - **Continuar (revive):** 1 vez por partida (`S.revived`), após vídeo premiado. Dá 3 peças pequenas (índices `PEQUENAS` em `BASES`) que cabem.
 - **Cores progressivas:** a partida começa só com azulejos cobalto (`t1`); uma cor nova é liberada em 100, 300, 600 e 1000 pontos (`MARCOS_COR`, `coresAte()`), com aviso "Nova cor!".
+- **Abertura SixPAC Games:** `#abertura` com `www/img/sixpac.webp` (logo branco recortado da arte do dono, original em `/mnt/project-files/sixpac/`), ~1,8 s, toque pula, respeita `prefers-reduced-motion`.
 - **Menu inicial:** `#menu` abre ao iniciar o app (Jogar/Continuar partida, Nova partida, Recordes, som). O botão "Menu" no rodapé volta a ele.
 - **Ranking local:** as 10 melhores partidas ficam em `azulejaria-ranking` (`{id,p,d}`), gravadas no fim de jogo (`registrarRank`).
 - **Continuar sem internet:** se o vídeo premiado não carregar em 6 s, o botão vira "Continuar" grátis (uma vez por partida), para nunca travar o jogo offline.
