@@ -194,6 +194,8 @@ html.tema-porto{--t1:#7AA2FF;--t2:#FFD36E;--t3:#72DDAE;--t4:#CDA2FF;--t5:#86E8F2
 @keyframes perigo{50%{box-shadow:0 0 0 2px #FF4D4D,0 0 22px 4px rgba(255,60,60,.6),0 5px 0 rgba(4,12,52,.6)}}
 #trocar{font-size:.8rem}
 /* menu: linha de botões pequenos */
+#menu #mAtualizar{background:rgba(6,20,82,.55);color:var(--gold);box-shadow:inset 0 0 0 2px var(--gold),0 3px 0 rgba(4,12,52,.45);font-size:.9rem;padding:10px}
+#menu #mAtualizar:disabled{opacity:.75;filter:none}
 #menu .linha{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 #menu .linha button{font-size:.78rem;padding:11px 4px}
 #mDesafio{background:linear-gradient(180deg,#FFD95A,#F5A623);color:#5A2A00;text-shadow:none;box-shadow:0 4px 0 #A65F00,0 6px 12px rgba(0,0,0,.25)}
@@ -222,6 +224,7 @@ html.tema-porto{--t1:#7AA2FF;--t2:#FFD36E;--t3:#72DDAE;--t4:#CDA2FF;--t5:#86E8F2
 <script src="sons.js"></script>
 <script src="idioma.js"></script>
 <script src="metricas.js"></script>
+<script src="atualizacao.js"></script>
 </head>
 <body>
 <div id="abertura" aria-label="SixPAC Games"><img src="img/sixpac.webp" alt="SixPAC Games"></div>
@@ -294,6 +297,7 @@ html.tema-porto{--t1:#7AA2FF;--t2:#FFD36E;--t3:#72DDAE;--t4:#CDA2FF;--t5:#86E8F2
   <div class="sub" data-t="subtitulo">Block Puzzle!</div>
   <div class="melhor" id="menuBest"></div>
   <div class="acoes">
+    <button id="mAtualizar" type="button" hidden></button>
     <button id="mJogar" type="button" data-t="jogar">Jogar</button>
     <button id="mNova" type="button" class="claro" data-t="novaPartida" hidden>Nova partida</button>
     <button id="mDesafio" type="button"><span data-t="desafio">Desafio diário</span><small id="mDesafioInfo"></small></button>
@@ -593,6 +597,12 @@ $("mJogar").onclick=()=>entrar("classico");
 $("mNova").onclick=()=>{overDesde=0;newGame("classico");fecharMenu()};
 $("mDesafio").onclick=()=>{const s=carregar("diario");if(s&&s.over&&s.revived){S=s;render();fecharMenu();return}entrar("diario")};
 $("abrirMenu").onclick=abrirMenu;
+/* aviso de atualização da Play Store (só aparece no menu, nunca durante a jogada) */
+function renderAtualizar(e){const b=$("mAtualizar");if(!b)return;
+  const txt={disponivel:"atualDisp",loja:"atualDisp",baixando:"atualBaixando",pronta:"atualPronta"}[e];
+  b.hidden=!txt;b.disabled=e==="baixando";if(txt)b.textContent=T(txt)}
+$("mAtualizar").onclick=()=>{if(S)save();if(window.Atualizacao)Atualizacao.agir()};
+if(window.Atualizacao)Atualizacao.iniciar(renderAtualizar);
 function renderSomMenu(){const on=!window.Sons||Sons.ligado;$("somMenu").innerHTML=on?ICONE_SOM:ICONE_MUDO;$("somMenu").setAttribute("aria-label",on?T("desligarSom"):T("ligarSom"))}
 $("somMenu").onclick=()=>{if(window.Sons)Sons.alternar();renderSom();renderSomMenu()};
 
